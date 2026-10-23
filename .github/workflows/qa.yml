@@ -27,7 +27,7 @@ jobs:
       - name: Unit and integration tests
         run: npm test
       - name: Build production static site
-        run: node build.cjs
+        run: node build.cjs && node scripts/verify-seo.cjs
       - name: Install browser QA dependency
         run: npm install --no-save playwright@1.62.1
       - name: Verify runner Chrome

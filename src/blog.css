@@ -6,3 +6,10 @@
 .footer-brand{display:inline-flex;align-items:center;margin-bottom:10px}
 .footer-brand img{display:block;width:156px;height:auto}
 @media(max-width:600px){.brand.brand-image img{width:158px}.footer-brand img{width:142px}}
+
+/* Guide navigation and diagnostic tables */
+.article-toc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin:28px 0}
+.article-toc ul{padding-left:22px;margin-bottom:0}.article h2[id]{scroll-margin-top:110px}
+.table-scroll{overflow-x:auto;margin:24px 0}.table-scroll table{width:100%;border-collapse:collapse;text-align:left;font-size:.98rem}
+.table-scroll th,.table-scroll td{border:1px solid var(--line);padding:12px;vertical-align:top}.table-scroll th{background:#e8eee9}
+.start-here{padding:8px 0 30px}.start-here h2{font-size:2rem}

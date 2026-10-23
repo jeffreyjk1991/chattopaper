@@ -4,8 +4,9 @@
   "private": true,
   "description": "ChatToPaper turns a WhatsApp export into a printable PDF with photos and publishes practical export/printing guides.",
   "scripts": {
-    "build": "npm test && node build.cjs",
-    "test": "node --test tests/*.test.cjs"
+    "build": "npm test && node build.cjs && node scripts/verify-seo.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "verify:seo": "node scripts/verify-seo.cjs"
   },
   "dependencies": {
     "pako": "1.0.11",

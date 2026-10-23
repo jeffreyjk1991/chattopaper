@@ -64,5 +64,12 @@
       ]
     }
   ],
-  "trailingSlash": true
+  "trailingSlash": true,
+  "redirects": [
+    {
+      "source": "/ChatToPaper.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
 }

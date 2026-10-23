@@ -155,9 +155,13 @@ const published = '2026-10-22';
 const updated = '2026-10-23';
 const articles = clusters.flatMap(cluster => cluster.items.map(([title, slug, answer, keyword], index) => ({
   title, slug, category: cluster.category, answer, keyword,
-  description: `${answer} This ChatToPaper guide explains the practical workflow, limitations, privacy considerations, and what to check before printing.`,
+  description: answer,
   published, updated,
   order: index
 })));
 if (articles.length !== 100) throw new Error(`Expected 100 articles, got ${articles.length}`);
+const detailed = require('./detailed-guides.cjs');
+for (const article of articles) {
+  if (detailed[article.slug]) Object.assign(article, detailed[article.slug]);
+}
 module.exports = articles;
