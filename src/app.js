@@ -197,10 +197,8 @@
     document.querySelectorAll('.sample-prompt').forEach(el=>{el.hidden=false;});
     emptyPreview('Ready for your conversation.','Choose a ZIP or TXT with photos to get started.');
     $('dropzone').hidden=false;$('imported-file').hidden=true;$('import-status').textContent='Your conversation has been cleared.';updateDownloadEnabled();
-    try{
-      if(!state.sampleSource)state.sampleSource=makeSampleSource();
-      await setSource(state.sampleSource,{sample:true,active:false,token});
-    }catch(error){emptyPreview('Ready for your conversation.','Choose a ZIP or TXT with photos to get started.');setError('The sample preview is unavailable. You can still choose your own chat.');}
+    try{if(!state.sampleSource)state.sampleSource=makeSampleSource();}catch(_){}
+    emptyPreview('Your preview appears here.','Upload a WhatsApp export or try a sample.');
     if(token===state.importRevision){toast('Your conversation has been cleared.');$('file-input').focus({preventScroll:true});}
   }
   function reparseDateOrder() {
@@ -246,7 +244,7 @@
   }
   function updateDownloadEnabled() {
     const button=$('download-open');button.disabled=!state.active||!state.doc||state.rendering||state.dirty||state.importing||state.exporting;
-    button.replaceChildren(document.createTextNode(state.active&&!state.dateConfirmed?'Confirm your dates':'Keep this conversation'),icon('arrow'));
+    button.replaceChildren(document.createTextNode(state.active&&!state.dateConfirmed?'Confirm dates':'Pay & download PDF'),icon('arrow'));
     $('expand-preview').disabled=!state.doc||state.rendering||state.dirty;
   }
   function scheduleRender(delay=160) {
@@ -474,9 +472,9 @@
       return;
     }
     try {
-      const token=state.importRevision;
       state.sampleSource=makeSampleSource();
-      await setSource(state.sampleSource,{sample:true,active:false,token});
+      emptyPreview('Your preview appears here.','Upload a WhatsApp export or try a sample.');
+      updateDownloadEnabled();
     }catch(error){
       if(!state.active&&!state.importing){emptyPreview('Ready for your conversation.','Choose a ZIP or TXT with photos to get started.');setError('The sample preview could not load. File selection is still available. '+error.message);}
     }
