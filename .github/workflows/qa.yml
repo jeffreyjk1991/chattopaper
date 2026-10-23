@@ -14,6 +14,7 @@ jobs:
     env:
       SITE_URL: https://chattopaper.com
       FREE_LAUNCH: "true"
+      PLAYWRIGHT_USE_SYSTEM_CHROME: "true"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -29,7 +30,7 @@ jobs:
         run: node build.cjs
       - name: Install browser QA dependency
         run: npm install --no-save playwright@1.62.1
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Verify runner Chrome
+        run: google-chrome --version
       - name: Browser end-to-end flow
         run: node tests/e2e.cjs
