@@ -12,6 +12,8 @@
   const formatNumber = n => new Intl.NumberFormat('en').format(n || 0);
   const stripePaymentLink = window.CHATTOPAPER_STRIPE_PAYMENT_LINK || '';
   const stripeTestMode = Boolean(window.CHATTOPAPER_STRIPE_TEST_MODE);
+  const freeLaunchMode = Boolean(window.CHATTOPAPER_FREE_LAUNCH);
+  if(freeLaunchMode) state.paymentUnlocked=true;
   const PAYMENT_PENDING_KEY = 'chattopaper.payment.pending.v2';
   const PAYMENT_SUCCESS_KEY = 'chattopaper.payment.success.v2';
   const PAYMENT_CHANNEL = 'chattopaper-payments-v2';
@@ -50,7 +52,7 @@
     return blobAsDataURL(blob);
   }
   function clearPaymentHandoff() {
-    state.paymentUnlocked=false;state.paymentRef=null;state.paymentSessionId=null;
+    state.paymentUnlocked=freeLaunchMode;state.paymentRef=null;state.paymentSessionId=null;
     try{localStorage.removeItem(PAYMENT_PENDING_KEY);localStorage.removeItem(PAYMENT_SUCCESS_KEY);}catch(_){}
   }
   function readStoredPaymentSuccess() {
@@ -244,7 +246,7 @@
   }
   function updateDownloadEnabled() {
     const button=$('download-open');button.disabled=!state.active||!state.doc||state.rendering||state.dirty||state.importing||state.exporting;
-    button.replaceChildren(document.createTextNode(state.active&&!state.dateConfirmed?'Confirm dates':'Pay & download PDF'),icon('arrow'));
+    button.replaceChildren(document.createTextNode(state.active&&!state.dateConfirmed?'Confirm dates':(freeLaunchMode?'Download PDF — Free':'Pay & download PDF')),icon(freeLaunchMode?'download':'arrow'));
     $('expand-preview').disabled=!state.doc||state.rendering||state.dirty;
   }
   function scheduleRender(delay=160) {
@@ -323,10 +325,10 @@
     const warnings=allWarnings();const box=$('download-alerts');box.replaceChildren();
     if(warnings.length){const ul=document.createElement('ul');warnings.forEach(w=>ul.append(txt('li',w)));box.append(ul);}
     box.hidden=!warnings.length;
-    $('download-status').textContent=state.paymentUnlocked?'Payment confirmed for this browser session. Your PDF is ready to create.':(stripeTestMode?'Stripe test mode: complete checkout in the new tab, then return here.':'Pay securely with Stripe to unlock this PDF.');
+    $('download-status').textContent=freeLaunchMode?'Limited-time free launch — no checkout required. Your PDF is ready to create.':(state.paymentUnlocked?'Payment confirmed for this browser session. Your PDF is ready to create.':(stripeTestMode?'Stripe test mode: complete checkout in the new tab, then return here.':'Pay securely with Stripe to unlock this PDF.'));
     $('download-ready-link').hidden=true;
     $('download-progress').hidden=true;$('download-confirm').disabled=false;
-    $('download-confirm').replaceChildren(document.createTextNode(state.paymentUnlocked?'Download PDF':(stripeTestMode?'Test pay 99¢ with Stripe':'Pay 99¢ with Stripe')),icon(state.paymentUnlocked?'download':'arrow'));
+    $('download-confirm').replaceChildren(document.createTextNode(freeLaunchMode?'Download PDF — Free':(state.paymentUnlocked?'Download PDF':(stripeTestMode?'Test pay 99¢ with Stripe':'Pay 99¢ with Stripe'))),icon((freeLaunchMode||state.paymentUnlocked)?'download':'arrow'));
     $('step-download').classList.add('current');openDialog('download-dialog');
   }
   function beginStripePayment() {
@@ -383,7 +385,7 @@
       state.downloadName=name+'.pdf';
       $('download-ready-link').href=state.downloadURL;$('download-ready-link').download=state.downloadName;$('download-ready-link').hidden=false;
       const mb=blob.size/1024/1024;
-      $('download-status').textContent=`Payment complete. Your ${doc.pages.length}-page PDF is ready (${mb<1?Math.round(blob.size/1024)+' KB':mb.toFixed(1)+' MB'}). Tap “Save PDF” below.`;
+      $('download-status').textContent=`Your ${doc.pages.length}-page PDF is ready (${mb<1?Math.round(blob.size/1024)+' KB':mb.toFixed(1)+' MB'}). Tap “Save PDF” below.`;
       track('pdf_ready',{pages:doc.pages.length,bytes:blob.size});
       button.replaceChildren(document.createTextNode('Save PDF'),icon('download'));
       if(attemptSave){savePreparedPDF();track('pdf_downloaded',{pages:doc.pages.length,bytes:blob.size});}
@@ -394,6 +396,7 @@
     }finally{state.exporting=false;button.disabled=false;close.disabled=false;$('download-return').disabled=false;updateDownloadEnabled();}
   }
   async function downloadPDF() {
+    if(freeLaunchMode) state.paymentUnlocked=true;
     if(!state.paymentUnlocked){beginStripePayment();return;}
     if(state.downloadURL){if(savePreparedPDF())track('pdf_downloaded',{prepared:true});return;}
     await createPDF({attemptSave:true});
