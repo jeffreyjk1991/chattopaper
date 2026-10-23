@@ -21,6 +21,12 @@
   const icon = name => { const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','icon'); const use=document.createElementNS('http://www.w3.org/2000/svg','use'); use.setAttribute('href','#i-'+name);svg.append(use);return svg; };
   const txt = (tag, value, className) => {const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
   function track(name, data={}) { try { if(typeof window.va==='function') window.va('event', {name, data}); } catch(_){} }
+  async function recordPdfUsage() {
+    try {
+      const eventId=(typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function')?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(16).slice(2);
+      await fetch('/api/usage',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({eventId}),keepalive:true});
+    } catch(_) { /* Usage counting must never block PDF creation. */ }
+  }
   function toast(message, error=false) {
     clearTimeout(state.toastTimer);$('toast').textContent=message;$('toast').classList.toggle('error',error);$('toast').hidden=false;
     state.toastTimer=setTimeout(()=>{$('toast').hidden=true;},5000);
@@ -387,6 +393,7 @@
       const mb=blob.size/1024/1024;
       $('download-status').textContent=`Your ${doc.pages.length}-page PDF is ready (${mb<1?Math.round(blob.size/1024)+' KB':mb.toFixed(1)+' MB'}). Tap “Save PDF” below.`;
       track('pdf_generated');
+      void recordPdfUsage();
       track('pdf_ready',{pages:doc.pages.length,bytes:blob.size});
       button.replaceChildren(document.createTextNode('Save PDF'),icon('download'));
       if(attemptSave){savePreparedPDF();track('pdf_downloaded',{pages:doc.pages.length,bytes:blob.size});}
