@@ -20,9 +20,13 @@ const write = (relative, body) => { const file=out(relative); fs.mkdirSync(path.
 const image = data('assets/coast.svg', 'image/svg+xml');
 let css = read('src/styles.css');
 let html = read('src/index.html');
+const pdfLib = readResolved('pdf-lib/dist/pdf-lib.min.js');
+const zipLib = readResolved('pako/dist/pako_inflate.min.js');
+if (pdfLib.length < 300000 || !pdfLib.includes('PDFDocument')) throw new Error('pdf-lib dependency is missing or incomplete; refusing to publish a broken converter.');
+if (zipLib.length < 15000 || !zipLib.includes('Inflate')) throw new Error('pako ZIP dependency is missing or incomplete; refusing to publish a broken converter.');
 const scripts = {
-  '/*__PDF_LIB__*/': readResolved('pdf-lib/dist/pdf-lib.min.js'),
-  '/*__ZIP_LIB__*/': readResolved('pako/dist/pako_inflate.min.js'),
+  '/*__PDF_LIB__*/': pdfLib,
+  '/*__ZIP_LIB__*/': zipLib,
   '/*__IMPORTER__*/': read('src/importer.js'),
   '/*__DOCUMENT__*/': read('src/document.js'),
   '/*__APP__*/': read('src/app.js'),
