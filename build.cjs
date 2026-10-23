@@ -140,6 +140,25 @@ infoPage('editorial-policy','Editorial policy','How ChattoPaper creates, reviews
 infoPage('privacy','Privacy','ChattoPaper privacy information: local chat processing, Vercel analytics and Stripe checkout.',`<div class="eyebrow">PRIVACY</div><h1>Your chat files stay in your browser.</h1><p class="lede">ChattoPaper is designed so the WhatsApp export you select is processed locally in the browser instead of being uploaded to an application server.</p><h2>Conversation contents</h2><p>Your selected TXT, ZIP and supported image files are read in the page. Replacing or clearing the conversation releases the app’s references to those files; closing the tab ends that browser session.</p><h2>Analytics</h2><p>ChattoPaper uses Vercel Web Analytics and Speed Insights to understand visits and site performance. Those services do not receive the contents of the WhatsApp files you select for conversion.</p><h2>Payments</h2><p>Stripe handles checkout separately. ChattoPaper does not send your conversation text or photos to Stripe.</p><h2>Your finished PDF</h2><p>The PDF you create can contain personal information from the conversation. Review it before saving, printing or sharing it.</p>`);
 infoPage('terms','Terms','Terms for using ChattoPaper to format an exported WhatsApp conversation into a printable PDF.',`<div class="eyebrow">TERMS</div><h1>Using ChattoPaper.</h1><p class="lede">Use ChattoPaper only with conversation files you are entitled to process and share.</p><h2>A formatting tool</h2><p>ChattoPaper formats data present in your export. It does not guarantee that WhatsApp included every message or media file, recover deleted material, authenticate messages, or certify legal evidence.</p><h2>Review before relying</h2><p>Check the preview, date interpretation, sender names and missing-media warnings before using the finished document.</p><h2>Payments</h2><p>The intended product is a one-time payment per finished PDF, with no subscription. Stripe handles the payment experience separately from the local chat-processing workflow.</p><h2>Independence</h2><p>ChattoPaper is not affiliated with, endorsed by or sponsored by WhatsApp or Meta. WhatsApp and related marks belong to their respective owners.</p>`);
 
+// Dedicated Stripe return page. It carries no chat contents; it only relays
+// the Checkout Session ID back to the already-open converter tab.
+const paymentSuccessScript = `<script>(function(){
+  'use strict';
+  const SUCCESS_KEY='chattopaper.payment.success.v2', PENDING_KEY='chattopaper.payment.pending.v2', CHANNEL='chattopaper-payments-v2';
+  const params=new URLSearchParams(location.search), sessionId=params.get('session_id');
+  const valid=/^cs_(?:test|live)_[A-Za-z0-9_]+$/.test(String(sessionId||''));
+  let paymentRef=null;
+  try{paymentRef=JSON.parse(localStorage.getItem(PENDING_KEY)||'null')?.paymentRef||null;}catch(_){}
+  if(valid){
+    const payload={type:'chattopaper-stripe-success',sessionId,paymentRef,ts:Date.now()};
+    try{localStorage.setItem(SUCCESS_KEY,JSON.stringify(payload));}catch(_){}
+    try{if(typeof BroadcastChannel==='function'){const channel=new BroadcastChannel(CHANNEL);channel.postMessage({type:'success',sessionId,paymentRef,ts:payload.ts});channel.close();}}catch(_){}
+    document.documentElement.dataset.payment='success';
+    setTimeout(()=>{try{window.close();}catch(_){}},900);
+  }else document.documentElement.dataset.payment='invalid';
+})();</script>`;
+write('payment-success/index.html',`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#f6f5ef"><title>Payment complete | ChattoPaper</title><style>${blogCss}.payment-result{max-width:660px;margin:14vh auto;padding:0 24px;text-align:center}.payment-result h1{font-size:clamp(2.4rem,7vw,4.6rem);margin:.2em 0}.payment-result p{font-size:1.08rem;line-height:1.7}.payment-result .success-only,.payment-result .error-only{display:none}html[data-payment=success] .success-only{display:block}html[data-payment=invalid] .error-only{display:block}</style></head><body>${nav}<main class="payment-result"><div class="success-only"><div class="eyebrow">PAYMENT COMPLETE</div><h1>Your PDF is being prepared.</h1><p>ChattoPaper has notified the original tab where your conversation is still loaded. This payment tab should close automatically. If it stays open, close it and return to the original ChattoPaper tab — your PDF will be ready there.</p><button class="btn" onclick="window.close()">Return to my PDF</button></div><div class="error-only"><div class="eyebrow">RETURN LINK ISSUE</div><h1>We could not read the payment return.</h1><p>Return to the original ChattoPaper tab. Your conversation is still there. If the PDF does not unlock, reopen Checkout from that tab.</p><a class="btn" href="/">Back to ChattoPaper</a></div></main>${footer}${analytics}${paymentSuccessScript}</body></html>`);
+
 // Crawl/discovery files.
 const sitemapUrls=[
   {loc:`${SITE}/`,priority:'1.0'}, {loc:`${SITE}/blog/`,priority:'0.9'},
