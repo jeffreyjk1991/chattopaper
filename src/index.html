@@ -7,7 +7,7 @@
   <meta name="application-version" content="0.2.1">
   <meta name="description" content="Turn a WhatsApp export into a printable PDF with photos, sender names and timestamps. Choose your dates, preview every page and keep your conversations private on your device.">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://va.vercel-scripts.com; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src https://vitals.vercel-insights.com; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>ChattoPaper — WhatsApp chats, beautifully on paper</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23274339'/%3E%3Cpath d='M20 17h24v30H20z' fill='%23f6f5ef'/%3E%3Cpath d='M26 26h12m-12 6h12m-12 6h7' stroke='%23274339' stroke-width='3'/%3E%3C/svg%3E">
   <style>/*__STYLES__*/</style>
@@ -117,5 +117,7 @@
 <script>/*__DOCUMENT__*/</script>
 <script>window.CHATTOPAPER_SAMPLE_IMAGE = "__COAST_IMAGE__"; window.CHATTOPAPER_STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_14A14obls5UlaIpgY4gIo00"; window.CHATTOPAPER_STRIPE_TEST_MODE = true;</script>
 <script>/*__APP__*/</script>
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
