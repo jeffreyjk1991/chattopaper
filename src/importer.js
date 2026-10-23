@@ -25,6 +25,7 @@
   const MB = 1024 * 1024;
   const LIMITS = Object.freeze({
     uploadBytes: 100 * MB,
+    zipUploadBytes: 300 * MB,
     expandedBytes: 250 * MB,
     entryBytes: 40 * MB,
     chatBytes: 20 * MB,
@@ -238,8 +239,13 @@
   function inspectZip(bytes) {
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     let end = -1;
-    for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65557); i--) {
-      if (view.getUint32(i, true) === 0x06054b50 && i + 22 + view.getUint16(i + 20, true) === bytes.length) { end = i; break; }
+    // Accept a valid EOCD even when a file provider appends harmless trailing
+    // bytes after the ZIP comment. Some mobile/cloud providers do this while
+    // the archive remains readable by normal ZIP tools.
+    for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65557 - 4096); i--) {
+      if (view.getUint32(i, true) !== 0x06054b50) continue;
+      const declaredEnd = i + 22 + view.getUint16(i + 20, true);
+      if (declaredEnd <= bytes.length) { end = i; break; }
     }
     if (end === -1) fail('INVALID_ZIP', 'This ZIP is incomplete or damaged. Export the conversation again and select the new file.');
     const count = view.getUint16(end + 10, true), directorySize = view.getUint32(end + 12, true), directoryStart = view.getUint32(end + 16, true);
@@ -248,7 +254,7 @@
     if (count > LIMITS.entries) fail('TOO_MANY_FILES', 'This ZIP contains more than 5,000 files. Please use a smaller export.');
     if (directoryStart + directorySize > end) fail('INVALID_ZIP', 'The ZIP directory is damaged. Please select a new export.');
     const entries = [];
-    let offset = directoryStart, totalExpanded = 0;
+    let offset = directoryStart;
     for (let i = 0; i < count; i++) {
       if (offset + 46 > directoryStart + directorySize || view.getUint32(offset, true) !== 0x02014b50) fail('INVALID_ZIP', 'The ZIP directory is damaged. Please select a new export.');
       const flags = view.getUint16(offset + 8, true), method = view.getUint16(offset + 10, true);
@@ -260,9 +266,6 @@
       if (view.getUint16(offset + 34, true)) fail('MULTIPART_ZIP', 'Split ZIP archives are not supported.');
       if (offset + 46 + nameLength + extraLength + commentLength > directoryStart + directorySize) fail('INVALID_ZIP', 'A ZIP filename is damaged. Please select a new export.');
       const name = decodeFilename(bytes.subarray(offset + 46, offset + 46 + nameLength), Boolean(flags & 0x800));
-      if (size > LIMITS.entryBytes) fail('ENTRY_TOO_LARGE', 'A file inside this ZIP is larger than 40 MB. Please use a smaller export.');
-      totalExpanded += size;
-      if (totalExpanded > LIMITS.expandedBytes) fail('EXPANDED_TOO_LARGE', 'This ZIP expands beyond 250 MB. Please use a smaller export.');
       if (localOffset + 30 > directoryStart || view.getUint32(localOffset, true) !== 0x04034b50) fail('INVALID_ZIP', 'A file inside this ZIP is damaged. Please select a new export.');
       if (view.getUint16(localOffset + 8, true) !== method || (view.getUint16(localOffset + 6, true) & 1)) fail('INVALID_ZIP', 'The ZIP contains inconsistent file metadata. Please export the conversation again.');
       const localNameLength = view.getUint16(localOffset + 26, true), localExtraLength = view.getUint16(localOffset + 28, true);
@@ -358,6 +361,25 @@
       return new TextDecoder('utf-8', {fatal: true}).decode(bytes);
     } catch (_) { fail('TEXT_ENCODING', 'This chat is not a readable Unicode text file. Choose the original WhatsApp .txt export.'); }
   }
+  async function readFileBuffer(file) {
+    if (file && typeof file.arrayBuffer === 'function') {
+      try { return await file.arrayBuffer(); }
+      catch (_) { /* Fall through to FileReader for mobile/cloud file providers. */ }
+    }
+    if (typeof FileReader === 'function' && file instanceof Blob) {
+      return await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new ImportError('FILE_READ', 'This browser could not read the selected file. Save the WhatsApp export to your device and choose it again.'));
+        reader.onabort = () => reject(new ImportError('FILE_READ', 'Reading the selected file was interrupted. Choose it again.'));
+        reader.readAsArrayBuffer(file);
+      });
+    }
+    fail('FILE_READ', 'This browser could not read the selected file. Save the WhatsApp export locally and choose it again.');
+  }
+  function headerCount(text) {
+    return text.replace(/\r\n?|\n/g, '\n').split('\n').reduce((count, line) => count + (detectHeader(line) ? 1 : 0), 0);
+  }
   function addMedia(map, item, warnings) {
     const key = normalizeFilename(item.name);
     if (!key) return;
@@ -371,55 +393,71 @@
     const files = Array.from(fileList || []);
     if (!files.length) fail('NO_FILES', 'Choose a WhatsApp ZIP, or its .txt file together with photos.');
     if (files.length > LIMITS.entries) fail('TOO_MANY_FILES', 'Please select no more than 5,000 files at a time.');
-    if (files.reduce((sum, file) => sum + file.size, 0) > LIMITS.uploadBytes) fail('UPLOAD_TOO_LARGE', 'Please select files totaling 100 MB or less.');
     const zipFiles = files.filter(file => /\.zip$/i.test(file.name));
     const textFiles = files.filter(file => /\.txt$/i.test(file.name));
     if (zipFiles.length > 1 || (zipFiles.length && textFiles.length)) fail('MULTIPLE_CHATS', 'Choose one conversation at a time: one ZIP, or one .txt file with its photos.');
     if (textFiles.length > 1) fail('MULTIPLE_CHATS', 'Choose one conversation .txt file at a time.');
     if (!zipFiles.length && !textFiles.length) fail('NO_CHAT_FILE', 'Include the conversation .txt file, or select the original WhatsApp ZIP.');
+    const selectedBytes = files.reduce((sum, file) => sum + Number(file.size || 0), 0);
+    const uploadLimit = zipFiles.length ? LIMITS.zipUploadBytes : LIMITS.uploadBytes;
+    if (selectedBytes > uploadLimit) fail('UPLOAD_TOO_LARGE', `Please select ${zipFiles.length ? 'a ZIP under 300 MB' : 'files totaling 100 MB or less'}. For very large chats, export a smaller date/media set.`);
     const warnings = [], media = new Map();
     let text, fileName, chatFileName;
     function progress(done, total, name) { if (typeof options.onProgress === 'function') options.onProgress({done, total, name}); }
     if (zipFiles.length) {
       const zipFile = zipFiles[0];
       fileName = zipFile.name;
-      const bytes = new Uint8Array(await zipFile.arrayBuffer());
+      const bytes = new Uint8Array(await readFileBuffer(zipFile));
       const entries = inspectZip(bytes);
       const candidates = entries.filter(entry => /\.txt$/i.test(entry.name));
       const primary = candidates.filter(entry => /^_chat\.txt$/i.test(basename(entry.name)));
-      // A .txt can be an attached document. Inspect competing text files rather
-      // than silently choosing _chat.txt and losing a second conversation.
       const decodedCandidates = new Map();
-      let chosen = candidates;
-      if (candidates.length > 1) {
-        const chats = [];
+      let chat = null;
+      if (primary.length === 1) {
+        // iPhone exports conventionally use _chat.txt. Prefer it even when the
+        // conversation contains attached .txt documents.
+        chat = primary[0];
+      } else if (candidates.length === 1) {
+        chat = candidates[0];
+      } else if (candidates.length > 1) {
+        const scored = [];
         for (const candidate of candidates) {
           if (candidate.size > LIMITS.chatBytes) continue;
           let decoded;
           try { decoded = decodeText(await extractZipEntry(bytes, candidate)); }
           catch (error) { if (error.code === 'TEXT_ENCODING') continue; throw error; }
           decodedCandidates.set(candidate.name, decoded);
-          if (decoded.split(/\r\n?|\n/).some(detectHeader)) chats.push(candidate);
+          scored.push({candidate, score: headerCount(decoded)});
         }
-        chosen = chats.length ? chats : primary.length === 1 ? primary : candidates;
+        scored.sort((a, b) => b.score - a.score);
+        if (scored[0]?.score > 0 && (!scored[1] || scored[1].score === 0 || scored[0].score >= scored[1].score * 3)) chat = scored[0].candidate;
       }
-      if (chosen.length !== 1) fail(chosen.length ? 'MULTIPLE_CHATS' : 'NO_CHAT_FILE', chosen.length ? 'This ZIP contains more than one conversation text file. Unzip it and choose one .txt file with its photos.' : 'No .txt conversation was found in this ZIP. Export a chat from WhatsApp and try again.');
-      const chat = chosen[0];
+      if (!chat) fail(candidates.length ? 'MULTIPLE_CHATS' : 'NO_CHAT_FILE', candidates.length ? 'This ZIP contains more than one possible conversation text file. Unzip it and choose the WhatsApp chat .txt file with its photos.' : 'No .txt conversation was found in this ZIP. Export a chat from WhatsApp and try again.');
       if (chat.size > LIMITS.chatBytes) fail('CHAT_TOO_LARGE', 'The conversation text exceeds 20 MB. Please use a smaller export.');
       chatFileName = basename(chat.name);
       text = decodedCandidates.has(chat.name) ? decodedCandidates.get(chat.name) : decodeText(await extractZipEntry(bytes, chat));
       const photoEntries = entries.filter(entry => PHOTO_EXT.test(entry.name));
+      let extractedBytes = chat.size;
       for (let i = 0; i < photoEntries.length; i++) {
         const entry = photoEntries[i];
         progress(i + 1, photoEntries.length, basename(entry.name));
+        if (entry.size > LIMITS.entryBytes) {
+          warnings.push(`“${basename(entry.name)}” is larger than 40 MB, so it was left as a placeholder instead of failing the whole conversation.`);
+          continue;
+        }
+        if (extractedBytes + entry.size > LIMITS.expandedBytes) {
+          warnings.push('The photos in this export exceed the 250 MB safe extraction limit. Remaining large media were left as placeholders.');
+          break;
+        }
         const type = photoType(entry.name);
         const content = await extractZipEntry(bytes, entry);
+        extractedBytes += content.byteLength;
         addMedia(media, {name: basename(entry.name), blob: new Blob([content], {type}), type}, warnings);
       }
     } else {
       const textFile = textFiles[0];
       fileName = chatFileName = textFile.name;
-      text = decodeText(new Uint8Array(await textFile.arrayBuffer()));
+      text = decodeText(new Uint8Array(await readFileBuffer(textFile)));
     }
     const looseMedia = files.filter(file => PHOTO_EXT.test(file.name));
     for (const file of looseMedia) {
@@ -431,5 +469,5 @@
 
   return Object.freeze({parse, readFiles, linkMedia, normalizeFilename, ImportError, LIMITS,
     // Exported to make archive protections independently testable.
-    inspectZip, extractZipEntry, crc32});
+    inspectZip, extractZipEntry, crc32, readFileBuffer});
 });
