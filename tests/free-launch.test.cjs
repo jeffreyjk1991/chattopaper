@@ -11,3 +11,6 @@ test('free launch bypasses Stripe before PDF creation',()=>{
   assert.match(home,/Download PDF — Free/);
   assert.match(home,/<s>99¢<\/s>/);
 });
+
+
+test('build controls free launch from Vercel environment',()=>{const build=fs.readFileSync('build.cjs','utf8');assert.match(build,/process\.env\.FREE_LAUNCH/);assert.match(build,/__FREE_LAUNCH__/);});
