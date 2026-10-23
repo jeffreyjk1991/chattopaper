@@ -52,6 +52,15 @@
  <div class="eyebrow">WHATSAPP → PDF</div>
  <h1 id="hero-title">Turn your WhatsApp chat into a clean PDF.</h1>
  <p>Upload your WhatsApp export, preview the pages, then download your finished PDF.</p>
+ <div class="chat-to-paper-cue" aria-label="WhatsApp-style chat becomes a printable PDF">
+  <div class="cue-chat">
+   <div class="cue-top"><span class="cue-avatar"><svg class="icon"><use href="#i-chat"/></svg></span><span>WhatsApp export</span></div>
+   <div class="cue-bubble incoming">Save this conversation?<small>9:41</small></div>
+   <div class="cue-bubble outgoing">Yes — with the photos.<small>9:42 <b>✓✓</b></small></div>
+  </div>
+  <div class="cue-transform" aria-hidden="true">→</div>
+  <div class="cue-pdf"><svg class="icon"><use href="#i-file"/></svg><span><strong>Clean PDF</strong><small>ready to print</small></span></div>
+ </div>
  <div class="hero-actions"><a class="button dark large" href="#converter">Create PDF <svg class="icon"><use href="#i-arrow"/></svg></a><button class="sample-link" data-action="sample">Try a sample</button></div>
  <div class="minimal-trust"><span><svg class="icon"><use href="#i-lock"/></svg> Files stay in your browser</span><span class="launch-price"><s>99¢</s> <strong>Free for a limited time</strong></span><span>No account</span></div>
 </section>
@@ -62,7 +71,7 @@
   <div class="steps" aria-label="Conversion steps"><span class="step current"><b>1</b> Upload</span><span class="step-line"></span><span class="step" id="step-customize"><b>2</b> Preview</span><span class="step-line"></span><span class="step" id="step-download"><b>3</b> Download</span></div>
   <div class="workspace">
    <aside class="controls" aria-label="PDF settings">
-    <label id="dropzone" class="dropzone"><span class="upload-glyph"><svg class="icon"><use href="#i-upload"/></svg></span><h3>Choose your WhatsApp export</h3><p>ZIP, or TXT + photos</p><input id="file-input" class="native-file-input primary-native-input" type="file" multiple accept=".zip,.txt,.jpg,.jpeg,.png,.webp,.gif,.avif,application/zip,application/x-zip-compressed,text/plain,image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Choose WhatsApp exported ZIP or text and photos" aria-describedby="upload-help"><small id="upload-help">ZIP with photos up to 300 MB, or TXT + images up to 100 MB</small></label>
+    <label id="dropzone" class="dropzone"><span class="upload-glyph whatsapp-upload-glyph"><svg class="icon"><use href="#i-chat"/></svg></span><h3>Choose your WhatsApp export</h3><p>ZIP, or TXT + photos</p><input id="file-input" class="native-file-input primary-native-input" type="file" multiple accept=".zip,.txt,.jpg,.jpeg,.png,.webp,.gif,.avif,application/zip,application/x-zip-compressed,text/plain,image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Choose WhatsApp exported ZIP or text and photos" aria-describedby="upload-help"><small id="upload-help">ZIP with photos up to 300 MB, or TXT + images up to 100 MB</small></label>
     <div id="imported-file" class="imported-file" hidden><span class="file-glyph"><svg class="icon"><use href="#i-file"/></svg></span><div><strong id="file-name">Your conversation</strong><small id="file-meta"></small></div><label class="icon-button native-picker" id="replace-file" title="Replace conversation"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg><input id="replace-file-input" class="native-file-input" type="file" multiple accept=".zip,.txt,.jpg,.jpeg,.png,.webp,.gif,.avif,application/zip,application/x-zip-compressed,text/plain,image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Replace conversation"></label><button class="icon-button" id="clear-file" aria-label="Clear conversation" title="Clear conversation"><svg class="icon"><use href="#i-x"/></svg></button></div>
     <button class="sample-prompt" data-action="sample">Not ready? <strong>Try a sample</strong></button>
     <div class="import-status" id="import-status" role="status" aria-live="polite"></div>
@@ -90,7 +99,7 @@
  <div class="converter-footnote"><svg class="icon"><use href="#i-info"/></svg> Need help exporting? <a href="/blog/export-whatsapp-chat-iphone/">iPhone</a> · <a href="/blog/export-whatsapp-chat-android/">Android</a></div>
 </section>
 <section class="minimal-help shell" aria-labelledby="help-title">
- <div><div class="eyebrow">NEED HELP?</div><h2 id="help-title">That’s it.</h2><p>Export one WhatsApp conversation, upload it above, and check the preview before paying.</p></div>
+ <div><div class="eyebrow">NEED HELP?</div><h2 id="help-title">That’s it.</h2><p>Export one WhatsApp conversation, upload it above, and check the preview before downloading.</p></div>
  <div class="minimal-help-links"><a href="/blog/export-whatsapp-chat-iphone/">Export on iPhone <span>→</span></a><a href="/blog/export-whatsapp-chat-android/">Export on Android <span>→</span></a><a href="/blog/">All guides <span>→</span></a></div>
 </section>
 <section id="faq" class="minimal-faq shell" aria-labelledby="faq-title">
