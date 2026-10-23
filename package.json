@@ -1,8 +1,8 @@
 {
   "name": "chattopaper-whatsapp-pdf",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
-  "description": "ChattoPaper turns a WhatsApp export into a printable PDF with photos.",
+  "description": "ChattoPaper turns a WhatsApp export into a printable PDF with photos and publishes practical export/printing guides.",
   "scripts": {
     "build": "node build.cjs"
   },
