@@ -21,6 +21,6 @@ test('homepage is intentionally minimal', () => {
 });
 test('homepage uses approved ChatToPaper wordmark',()=>{
   assert.match(html,/class="brand brand-image"/);
-  assert.match(html,/\/assets\/logo-wordmark\.svg/);
-  assert.match(html,/\/assets\/logo-icon\.svg/);
+  assert.match(html,/\/assets\/logo-wordmark-original-20261023\.png/);
+  assert.match(html,/\/assets\/logo-icon-original-20261023\.png/);
 });

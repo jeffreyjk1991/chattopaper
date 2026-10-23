@@ -63,12 +63,12 @@ test('about page reads the live PDF usage count through first-party API',()=>{
 test('approved logo assets are wired across branding',()=>{
   const home=fs.readFileSync('src/index.html','utf8');
   const build=fs.readFileSync('build.cjs','utf8');
-  for(const asset of ['logo-icon.svg','logo-wordmark.svg']){
+  for(const asset of ['logo-icon-original-20261023.png','logo-wordmark-original-20261023.png']){
     assert.ok(fs.existsSync('assets/'+asset),asset+' missing');
     assert.match(build,new RegExp(asset.replace('.','\\.')));
   }
-  assert.match(home,/logo-wordmark\.svg/);
-  assert.match(home,/logo-icon\.svg/);
+  assert.match(home,/logo-wordmark-original-20261023\.png/);
+  assert.match(home,/logo-icon-original-20261023\.png/);
   assert.match(build,/brand-image/);
   assert.match(build,/manifest\.webmanifest/);
 });
