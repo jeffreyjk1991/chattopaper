@@ -386,6 +386,7 @@
       $('download-ready-link').href=state.downloadURL;$('download-ready-link').download=state.downloadName;$('download-ready-link').hidden=false;
       const mb=blob.size/1024/1024;
       $('download-status').textContent=`Your ${doc.pages.length}-page PDF is ready (${mb<1?Math.round(blob.size/1024)+' KB':mb.toFixed(1)+' MB'}). Tap “Save PDF” below.`;
+      track('pdf_generated');
       track('pdf_ready',{pages:doc.pages.length,bytes:blob.size});
       button.replaceChildren(document.createTextNode('Save PDF'),icon('download'));
       if(attemptSave){savePreparedPDF();track('pdf_downloaded',{pages:doc.pages.length,bytes:blob.size});}
