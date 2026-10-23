@@ -1,6 +1,6 @@
-# ChattoPaper
+# ChatToPaper
 
-ChattoPaper turns a WhatsApp chat export into a printable PDF with messages, timestamps, sender names, and supported photos in their conversation positions.
+ChatToPaper turns a WhatsApp chat export into a printable PDF with messages, timestamps, sender names, and supported photos in their conversation positions.
 
 ## Product
 
@@ -22,7 +22,7 @@ ChattoPaper turns a WhatsApp chat export into a printable PDF with messages, tim
 
 ## Privacy
 
-The converter processes selected chat files in the browser. Conversation text and photos are not uploaded to a ChattoPaper application server. Vercel analytics measures site usage/performance; Stripe handles checkout separately.
+The converter processes selected chat files in the browser. Conversation text and photos are not uploaded to a ChatToPaper application server. Vercel analytics measures site usage/performance; Stripe handles checkout separately.
 
 ## Local build
 
@@ -35,6 +35,6 @@ The production static site is generated in `dist/`. Vercel is configured through
 
 ## Brand
 
-Product name: **ChattoPaper**.
+Product name: **ChatToPaper**.
 
-ChattoPaper is an independent formatting tool and is not affiliated with, endorsed by, or sponsored by WhatsApp or Meta.
+ChatToPaper is an independent formatting tool and is not affiliated with, endorsed by, or sponsored by WhatsApp or Meta.
