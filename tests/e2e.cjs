@@ -55,7 +55,7 @@ async function main(){
   const srv=server();
   await new Promise(resolve=>srv.listen(0,'127.0.0.1',resolve));
   const port=srv.address().port, base=`http://127.0.0.1:${port}`;
-  const browser=await chromium.launch({headless:true});
+  const browser=await chromium.launch(process.env.PLAYWRIGHT_USE_SYSTEM_CHROME==='true'?{headless:true,channel:'chrome'}:{headless:true});
   try{
     const context=await browser.newContext({acceptDownloads:true,viewport:{width:1440,height:1000}});
     const page=await context.newPage();
