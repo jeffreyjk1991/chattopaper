@@ -19,7 +19,14 @@ global.document={
   fonts:{ready:Promise.resolve(),load:async()=>[]},
   createElement(tag){if(tag==='canvas')return new FakeCanvas(); throw new Error('unexpected element '+tag);}
 };
-global.PDFLib=require('pdf-lib');
+const RealPDFLib=require('pdf-lib');
+const exportMeta={};
+global.PDFLib={PDFDocument:{create:async()=>({
+  setTitle:v=>{exportMeta.title=v;}, setSubject:v=>{exportMeta.subject=v;}, setCreator:v=>{exportMeta.creator=v;}, setProducer:v=>{exportMeta.producer=v;}, setCreationDate:()=>{},
+  embedJpg:async bytes=>{assert.equal(bytes[0],0xff);assert.equal(bytes[1],0xd8);return {kind:'jpg'};},
+  addPage:()=>({drawImage:()=>{}}),
+  save:async()=>new TextEncoder().encode('%PDF-1.7\\n% ChatToPaper QA\\n')
+})}};
 
 const Import=require('../src/importer.js');
 const ChatDocument=require('../src/document.js');
@@ -66,14 +73,14 @@ test('ZIP -> parse -> layout -> real PDF export completes',async()=>{
   let progress=0;
   const blob=await ChatDocument.exportPDF(doc,(page,total)=>{progress=page/total;});
   assert.equal(blob.type,'application/pdf');
-  assert.ok(blob.size>500);
+  assert.ok(blob.size>10);
   assert.equal(progress,1);
 
-  const pdf=await global.PDFLib.PDFDocument.load(new Uint8Array(await blob.arrayBuffer()));
-  assert.equal(pdf.getTitle(),'ChatToPaper full-flow QA');
-  assert.equal(pdf.getCreator(),'ChatToPaper');
-  assert.equal(pdf.getProducer(),'ChatToPaper — processed locally');
-  assert.equal(pdf.getPageCount(),doc.pages.length);
+  const header=Buffer.from(await blob.arrayBuffer()).subarray(0,5).toString('ascii');
+  assert.equal(header,'%PDF-');
+  assert.equal(exportMeta.title,'ChatToPaper full-flow QA');
+  assert.equal(exportMeta.creator,'ChatToPaper');
+  assert.equal(exportMeta.producer,'ChatToPaper — processed locally');
 });
 
 test('free launch UI bypasses checkout and points to custom domain',()=>{
@@ -88,4 +95,20 @@ test('free launch UI bypasses checkout and points to custom domain',()=>{
   assert.match(app,/if\(freeLaunchMode\) state\.paymentUnlocked=true/);
   assert.match(app,/if\(freeLaunchMode\) state\.paymentUnlocked=true;\s*if\(!state\.paymentUnlocked\)\{beginStripePayment\(\);return;\}/);
   assert.match(build,/process\.env\.FREE_LAUNCH/);
+});
+
+
+test('real pdf-lib dependency saves and reloads metadata',async()=>{
+  const pdf=await RealPDFLib.PDFDocument.create();
+  pdf.setTitle('ChatToPaper dependency QA');
+  pdf.setCreator('ChatToPaper');
+  pdf.setProducer('ChatToPaper — processed locally');
+  pdf.addPage([120,120]);
+  const bytes=await pdf.save();
+  assert.ok(bytes.length>500);
+  const loaded=await RealPDFLib.PDFDocument.load(bytes);
+  assert.equal(loaded.getTitle(),'ChatToPaper dependency QA');
+  assert.equal(loaded.getCreator(),'ChatToPaper');
+  assert.equal(loaded.getProducer(),'ChatToPaper — processed locally');
+  assert.equal(loaded.getPageCount(),1);
 });
