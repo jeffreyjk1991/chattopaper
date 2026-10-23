@@ -45,3 +45,12 @@ test('production metadata uses chattopaper.com and free launch offer', () => {
   assert.match(home,/CHATTOPAPER_FREE_LAUNCH = __FREE_LAUNCH__/);
   assert.match(home,/Free for a limited time/);
 });
+
+
+test('about page exposes periodic PDF usage count only outside the homepage',()=>{
+  const build=fs.readFileSync('build.cjs','utf8');
+  const home=fs.readFileSync('src/index.html','utf8');
+  assert.match(build,/PDF_GENERATED_COUNT/);
+  assert.match(build,/PDFs generated since tracking started/);
+  assert.doesNotMatch(home,/PDFs generated since tracking started/);
+});
