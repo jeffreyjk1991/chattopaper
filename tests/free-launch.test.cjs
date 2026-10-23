@@ -14,3 +14,9 @@ test('free launch bypasses Stripe before PDF creation',()=>{
 
 
 test('build controls free launch from Vercel environment',()=>{const build=fs.readFileSync('build.cjs','utf8');assert.match(build,/process\.env\.FREE_LAUNCH/);assert.match(build,/__FREE_LAUNCH__/);});
+
+
+test('successful PDF creation records a dedicated usage event',()=>{
+  assert.match(app,/track\('pdf_generated'\)/);
+  assert.match(app,/track\('pdf_generated'\);\s*track\('pdf_ready'/);
+});
