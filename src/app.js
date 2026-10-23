@@ -23,14 +23,14 @@
   function track(name, data={}) { try { if(typeof window.va==='function') window.va('event', {name, data}); } catch(_){} }
   async function recordPdfUsage() {
     try {
-      const eventId=(typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function')?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(16).slice(2);
-      await fetch('https://ep-cool-bar-b4ppza3t.apirest.c-6.us-east-2.aws.neon.tech/neondb/rest/v1/pdf_generation_events',{
+      const eventId=(typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function')?crypto.randomUUID():null;
+      if(!eventId)return;
+      await fetch('/api/pdf-count',{
         method:'POST',
-        mode:'cors',
-        cache:'no-store',
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify({eventId}),
         keepalive:true,
-        headers:{'content-type':'application/json','prefer':'return=minimal'},
-        body:JSON.stringify({event_id:eventId})
+        cache:'no-store'
       });
     } catch(_) { /* Usage counting must never block PDF creation. */ }
   }
