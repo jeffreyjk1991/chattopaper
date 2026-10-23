@@ -42,3 +42,62 @@ dialog{color:var(--ink);border:1px solid #dde3d4;background:#fdfdf8;border-radiu
 .primary-native-input::file-selector-button{appearance:none;-webkit-appearance:none;width:145px;height:40px;border:1px solid #395542;border-radius:7px;background:#395542;color:white;font-size:12px;font-weight:600;cursor:pointer} 
 .primary-native-input:focus-visible{outline:3px solid #9bae71;outline-offset:2px;border-radius:7px} 
 .native-picker .native-file-input{opacity:0!important;position:absolute;inset:0;width:100%;height:100%;z-index:2} 
+
+/* v0.4 minimalist homepage */
+.minimal-home{background:#f8f7f2;color:#24372f}
+.minimal-header{height:76px;border-bottom:1px solid #e6e7df;display:flex;align-items:center;justify-content:space-between;gap:28px}
+.minimal-header .brand{font-size:24px;letter-spacing:-.8px}
+.minimal-header nav{display:flex;gap:28px;margin-left:auto}
+.minimal-header nav a{font-size:12px;color:#526259;text-decoration:none}
+.minimal-header .button{min-height:38px;padding:0 18px}
+.minimal-hero{text-align:center;padding-top:78px;padding-bottom:58px;max-width:830px}
+.minimal-hero .eyebrow{justify-content:center;margin-bottom:18px}
+.minimal-hero h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(46px,7vw,78px);line-height:.98;letter-spacing:-3.4px;font-weight:400;max-width:760px;margin:0 auto;color:#21352c}
+.minimal-hero>p{max-width:590px;margin:24px auto 0;font-size:17px;line-height:1.75;color:#66736c}
+.minimal-hero .hero-actions{justify-content:center;margin-top:30px}
+.minimal-hero .sample-link{font-size:13px}
+.minimal-trust{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:25px;color:#6b756e;font-size:11px}
+.minimal-trust span{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid #e0e3da;border-radius:999px;background:#fbfbf8}
+.minimal-trust .icon{width:13px;height:13px}
+.minimal-home .converter-section{padding-top:20px;padding-bottom:54px}
+.minimal-section-heading{align-items:end;margin-bottom:18px}
+.minimal-section-heading h2{font-size:34px;letter-spacing:-1.2px}
+.minimal-home .converter-card{box-shadow:0 18px 55px rgba(43,61,51,.07);border-color:#e1e3dc}
+.minimal-home .steps{height:58px;background:#f5f5ef}
+.minimal-home .step{font-size:10px;letter-spacing:.6px}
+.minimal-home .step b{width:24px;height:24px}
+.minimal-home .controls{padding:28px}
+.minimal-home .dropzone{min-height:208px;padding:26px 18px;border-style:dashed;border-color:#cad0c7;background:#fbfbf8}
+.minimal-home .dropzone h3{font-size:20px;margin-top:12px}
+.minimal-home .dropzone p{font-size:12px;margin-top:5px;color:#7a837d}
+.minimal-home .dropzone small{font-size:9px;color:#8d958f;margin-top:9px}
+.minimal-home .sample-prompt{margin-top:12px}
+.customize-panel{margin-top:20px;border-top:1px solid #e7e8e1;border-bottom:1px solid #e7e8e1;padding:0}
+.customize-panel>summary{list-style:none;cursor:pointer;padding:16px 0;font-size:12px;font-weight:650;display:flex;align-items:center;justify-content:space-between;color:#405148}
+.customize-panel>summary::-webkit-details-marker{display:none}
+.customize-panel>summary:after{content:'+';font-size:18px;font-weight:400;color:#79857d}
+.customize-panel[open]>summary:after{content:'−'}
+.customize-panel>summary span{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#919a94;margin-left:auto;margin-right:10px;font-weight:600}
+.customize-panel .controls-content{padding-top:10px;padding-bottom:10px}
+.minimal-home .local-note{border-top:0;padding-top:18px;margin-top:0;font-size:10px;justify-content:center;color:#7e8982}
+.minimal-home .preview-toolbar{height:58px}
+.minimal-home .preview-stage{background:#f3f3ee}
+.minimal-home .result-bar{background:#fbfbf8}
+.minimal-home .converter-footnote{margin-top:13px;font-size:10px}
+.minimal-home .converter-footnote a{color:#48634f;text-decoration:underline;text-underline-offset:2px}
+.minimal-help{display:grid;grid-template-columns:1.1fr .9fr;gap:80px;padding-top:52px;padding-bottom:52px;border-top:1px solid #e3e5dc}
+.minimal-help h2,.minimal-faq h2{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:42px;letter-spacing:-1.6px;margin:8px 0 10px}
+.minimal-help p{font-size:13px;line-height:1.8;color:#6c7770;max-width:460px}
+.minimal-help-links{display:flex;flex-direction:column;border-top:1px solid #dde1d8}
+.minimal-help-links a{display:flex;justify-content:space-between;align-items:center;padding:16px 2px;border-bottom:1px solid #dde1d8;color:#2f4439;text-decoration:none;font-size:13px}
+.minimal-faq{display:grid;grid-template-columns:.7fr 1.3fr;gap:70px;padding-top:52px;padding-bottom:70px;border-top:1px solid #e3e5dc}
+.minimal-faq .faq-list{margin-top:0}
+.minimal-faq .faq-list summary{font-size:14px;padding-block:18px}
+.minimal-faq .faq-list details p{font-size:12px;line-height:1.75;color:#6a756f;padding-bottom:18px}
+.minimal-footer{border-top:1px solid #e3e5dc;padding:26px 0 34px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:30px}
+.minimal-footer>div{display:flex;justify-content:center;gap:20px}
+.minimal-footer a{text-decoration:none;color:#53645b;font-size:11px}
+.minimal-footer .brand{font-size:20px;color:#263b31}
+.minimal-footer small{font-size:9px;color:#8a938d}
+@media(max-width:900px){.minimal-header nav{display:none}.minimal-hero{padding-top:56px;padding-bottom:38px}.minimal-hero h1{letter-spacing:-2.5px}.minimal-help,.minimal-faq{grid-template-columns:1fr;gap:25px}.minimal-help{padding-block:42px}.minimal-faq{padding-block:42px 58px}.minimal-footer{grid-template-columns:1fr;text-align:center}.minimal-footer>div{justify-content:center}.minimal-home .converter-section{padding-top:10px}}
+@media(max-width:600px){.minimal-header{height:64px}.minimal-header .brand{font-size:21px}.minimal-header .button{min-height:34px;padding-inline:14px}.minimal-hero{padding-top:42px;padding-bottom:30px}.minimal-hero h1{font-size:48px;letter-spacing:-2px}.minimal-hero>p{font-size:14px;margin-top:18px}.minimal-hero .hero-actions{margin-top:22px}.minimal-trust{margin-top:18px}.minimal-section-heading{margin-bottom:14px}.minimal-section-heading h2{font-size:28px}.minimal-home .steps{height:54px}.minimal-home .controls{padding:20px}.minimal-home .dropzone{min-height:180px}.minimal-help h2,.minimal-faq h2{font-size:34px}.minimal-help,.minimal-faq{padding-inline:0}.minimal-footer>div{flex-wrap:wrap;gap:13px 18px}}
