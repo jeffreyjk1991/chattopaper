@@ -21,10 +21,9 @@
   const icon = name => { const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','icon'); const use=document.createElementNS('http://www.w3.org/2000/svg','use'); use.setAttribute('href','#i-'+name);svg.append(use);return svg; };
   const txt = (tag, value, className) => {const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
   function track(name, data={}) { try { if(typeof window.va==='function') window.va('event', {name, data}); } catch(_){} }
-  async function recordPdfUsage() {
+  function recordPdfUsage() {
     try {
-      const eventId=(typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function')?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(16).slice(2);
-      await fetch('/api/usage',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({eventId}),keepalive:true});
+      if(typeof window.va==='function') window.va('pageview',{route:'/usage/pdf-generated/',path:'/usage/pdf-generated/'});
     } catch(_) { /* Usage counting must never block PDF creation. */ }
   }
   function toast(message, error=false) {
