@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 250" role="img" aria-label="ChatToPaper">
+  <defs>
+    <linearGradient id="g" x1="26" y1="20" x2="202" y2="223" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#41df74"/>
+      <stop offset=".48" stop-color="#08b96d"/>
+      <stop offset="1" stop-color="#03845f"/>
+    </linearGradient>
+    <linearGradient id="p" x1="124" y1="29" x2="196" y2="178" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1" stop-color="#e5fff0"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(9 8)">
+    <path d="M22 48c0-18 15-33 33-33h104c23 0 41 18 41 41v98c0 25-20 44-44 44H83l-44 27 10-38c-16-11-27-29-27-49V48Z" fill="url(#g)"/>
+    <path d="M119 31h47l24 25v88c0 18-15 33-33 33h-51c14-15 21-35 21-59V67c0-14-3-25-8-36Z" fill="url(#p)"/>
+    <path d="M166 31v19c0 8 6 14 14 14h10" fill="#d9f9e7"/>
+    <rect x="51" y="83" width="85" height="13" rx="6.5" fill="#fff"/>
+    <rect x="51" y="112" width="82" height="13" rx="6.5" fill="#fff"/>
+    <rect x="51" y="141" width="47" height="13" rx="6.5" fill="#fff"/>
+  </g>
+  <text x="235" y="157" fill="#101826" font-family="Arial,Helvetica,sans-serif" font-size="104" font-weight="800" letter-spacing="-5">ChatToPaper</text>
+</svg>
