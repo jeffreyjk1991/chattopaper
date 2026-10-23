@@ -55,6 +55,7 @@ test('about page reads the live PDF usage count through first-party API',()=>{
   assert.match(build,/pdf-generated-count/);
   assert.doesNotMatch(home,/PDFs generated since tracking started/);
   const api=fs.readFileSync('api/pdf-count.js','utf8');
-  assert.match(api,/pdf_generation_events/);
-  assert.match(api,/count=exact/);
+  assert.match(api,/counterapi\.com/);
+  assert.match(api,/readOnly/);
+  assert.match(api,/START_NUMBER=2/);
 });
