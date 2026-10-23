@@ -182,3 +182,21 @@ write('manifest.webmanifest',JSON.stringify({name:'ChattoPaper',short_name:'Chat
 write('404.html',layout({title:'Page not found | ChattoPaper',description:'The requested ChattoPaper page could not be found.',canonical:`${SITE}/404`,robots:'noindex,follow',main:`<main class="article"><div class="eyebrow">404</div><h1>That page slipped away.</h1><p class="lede">Try the guide library or go back to the WhatsApp PDF converter.</p><p><a class="btn" href="/blog/">Browse guides</a> <a class="btn" href="/">Go home</a></p></main>`}));
 
 console.log(`Built converter + ${articles.length} articles + ${cats.length} category hubs. Sitemap URLs: ${sitemapUrls.length}.`);
+(async () => {
+  try {
+    const response = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: {'content-type':'application/json'},
+      body: JSON.stringify({
+        host: new URL(SITE).host,
+        key: INDEXNOW_KEY,
+        keyLocation: `${SITE}/${INDEXNOW_KEY}.txt`,
+        urlList: sitemapUrls.map(item => item.loc)
+      })
+    });
+    if (response.ok || response.status === 202) console.log(`IndexNow accepted ${sitemapUrls.length} URLs (HTTP ${response.status}).`);
+    else console.warn(`IndexNow submission returned HTTP ${response.status}; deployment continues.`);
+  } catch (error) {
+    console.warn('IndexNow submission skipped:', error.message);
+  }
+})();
