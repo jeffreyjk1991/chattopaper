@@ -96,7 +96,8 @@ async function main(){
     await page.locator('#download-return').click();
     await page.locator('#clear-file').click();
     await page.locator('#file-input').setInputFiles({name:'broken.zip',mimeType:'application/zip',buffer:Buffer.from('broken zip')});
-    await page.waitForFunction(()=>document.querySelector('#message-count')?.textContent.trim()==='—',null,{timeout:10000});
+    await page.waitForFunction(()=>document.querySelector('#message-count')?.textContent.trim()==='0' && !document.querySelector('#import-error')?.hidden && document.querySelector('#import-error')?.textContent.trim().length>0,null,{timeout:10000});
+    assert.match(await page.locator('#import-error').innerText(),/zip|archive/i);
     await page.locator('#file-input').setInputFiles({name:'WhatsApp Chat.zip',mimeType:'application/zip',buffer:zip});
     await waitText(page,'#message-count','3');
     await context.close();
