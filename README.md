@@ -8,8 +8,9 @@ ChattoPaper turns a WhatsApp chat export into a printable PDF with messages, tim
 - Filter the conversation by date.
 - Preview the printable pages before download.
 - Download a PDF locally in the browser.
-- No account is required in this preview build.
-- The planned offer shown in the UI is 99¢ per finished PDF; payment collection is not connected yet.
+- No ChattoPaper account is required.
+- Stripe Checkout is connected in sandbox mode for a one-time 99¢ PDF purchase.
+- Chat contents and photos remain local; Stripe receives payment/checkout information only.
 
 ## Privacy
 
