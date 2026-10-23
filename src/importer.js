@@ -1,4 +1,4 @@
-/* ChattoPaper — private WhatsApp import, with a bundled ZIP compatibility fallback.
+/* ChatToPaper — private WhatsApp import, with a bundled ZIP compatibility fallback.
  *
  * ChatImport.parse(text, {dateOrder: 'auto'|'DMY'|'MDY'}) returns:
  *   {messages, participants, dateOrder, ambiguousDates, warnings, stats}.
@@ -318,7 +318,7 @@
       } else {
         const Inflate = root.pako && root.pako.Inflate;
         if (typeof Inflate !== 'function') {
-          fail('BROWSER_ZIP', 'The ZIP compatibility component is unavailable. Reopen the complete ChattoPaper HTML file, or select the unzipped conversation .txt and photos together.');
+          fail('BROWSER_ZIP', 'The ZIP compatibility component is unavailable. Reopen the complete ChatToPaper HTML file, or select the unzipped conversation .txt and photos together.');
         }
         try {
           // Output is collected in bounded blocks so a forged expanded-size
