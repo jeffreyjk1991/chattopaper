@@ -130,3 +130,11 @@ dialog{color:var(--ink);border:1px solid #dde3d4;background:#fdfdf8;border-radiu
 .minimal-home .live-dot{background:var(--wa-green);box-shadow:0 0 0 4px rgba(37,211,102,.1)}
 @media(max-width:700px){.chat-to-paper-cue{grid-template-columns:1fr 26px 116px;gap:8px;margin-top:22px}.cue-chat{padding:10px}.cue-bubble{font-size:9px}.cue-pdf{min-height:91px;padding:9px;gap:7px}.cue-pdf>.icon{width:21px;height:21px}.cue-pdf strong{font-size:13px}.cue-pdf small{font-size:6.5px}.cue-transform{font-size:18px}}
 @media(max-width:460px){.chat-to-paper-cue{grid-template-columns:1fr 22px 94px}.cue-bubble{max-width:88%;font-size:8.5px;padding:7px 8px 5px}.cue-top{font-size:8px}.cue-avatar{width:20px;height:20px}.cue-pdf{min-height:82px;flex-direction:column;text-align:center}.cue-pdf strong{font-size:12px}.cue-pdf small{font-size:5.8px}.cue-pdf>.icon{width:20px;height:20px}}
+
+/* ChatToPaper approved brand system */
+.brand-image{display:inline-flex;align-items:center;line-height:0;letter-spacing:0;font-size:0}
+.brand-image img{display:block;width:196px;height:auto;max-width:none}
+.minimal-header .brand-image img{width:190px}
+.minimal-footer .footer-brand img{width:170px}
+@media(max-width:700px){.minimal-header .brand-image img{width:162px}.minimal-footer .footer-brand img{width:148px}}
+@media(max-width:460px){.minimal-header .brand-image img{width:146px}}
