@@ -8,13 +8,21 @@ ChattoPaper turns a WhatsApp chat export into a printable PDF with messages, tim
 - Filter the conversation by date.
 - Preview the printable pages before download.
 - Download a PDF locally in the browser.
-- No ChattoPaper account is required.
-- Stripe Checkout is connected in sandbox mode for a one-time 99¢ PDF purchase.
-- Chat contents and photos remain local; Stripe receives payment/checkout information only.
+- No account is required in the current build.
+- Stripe Checkout is connected in sandbox mode for a one-time 99¢ PDF purchase; live billing still requires the live Stripe account/runtime credential.
+
+## Discovery and analytics
+
+- 100 focused WhatsApp export/PDF articles generated as static HTML.
+- Blog category hubs and internal linking.
+- `sitemap.xml`, `robots.txt`, `llms.txt`, RSS, canonical URLs, Open Graph metadata, Article/WebApplication structured data.
+- OAI-SearchBot and GPTBot explicitly allowed in `robots.txt`.
+- Vercel Web Analytics and Speed Insights scripts are included on the converter and guide pages.
+- About, privacy, terms, and editorial-policy pages provide product and content provenance.
 
 ## Privacy
 
-The converter processes selected chat files in the browser. The current application does not upload conversation contents to an application server.
+The converter processes selected chat files in the browser. Conversation text and photos are not uploaded to a ChattoPaper application server. Vercel analytics measures site usage/performance; Stripe handles checkout separately.
 
 ## Local build
 
