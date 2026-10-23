@@ -1,4 +1,4 @@
-/* ChattoPaper document engine. Local-only, no network requests.
+/* ChatToPaper document engine. Local-only, no network requests.
  * API: await createDocument(messages, options), await renderPage(doc, page, canvas,
  * {scale}), await exportPDF(doc, progress). Preview and PDF use one layout.
  * Direct PDFs contain high-resolution page images to retain browser-rendered
@@ -432,11 +432,11 @@
     return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('The browser could not create the PDF page.')), 'image/jpeg', 0.95));
   }
   async function exportPDF(doc, onProgress) {
-    if (!root.PDFLib || !root.PDFLib.PDFDocument) throw new Error('The PDF component is missing. Reopen the complete ChattoPaper website file.');
+    if (!root.PDFLib || !root.PDFLib.PDFDocument) throw new Error('The PDF component is missing. Reopen the complete ChatToPaper website file.');
     if (!doc || !doc.pages.length) throw new Error('Create a preview before downloading your PDF.');
     const pdf = await root.PDFLib.PDFDocument.create();
     pdf.setTitle(doc.options.title); pdf.setSubject('Printable WhatsApp conversation');
-    pdf.setCreator('ChattoPaper'); pdf.setProducer('ChattoPaper — processed locally');
+    pdf.setCreator('ChatToPaper'); pdf.setProducer('ChatToPaper — processed locally');
     pdf.setCreationDate(new Date());
     const canvas = createCanvas();
     for (let index = 0; index < doc.pages.length; index++) {
