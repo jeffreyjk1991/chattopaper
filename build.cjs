@@ -4,6 +4,7 @@ const path = require('node:path');
 const root = __dirname;
 const SITE = (process.env.SITE_URL || 'https://chattopaper.com').replace(/\/+$/, '');
 const UPDATED = '2026-10-23';
+const FREE_LAUNCH = process.env.FREE_LAUNCH !== 'false';
 const INDEXNOW_KEY = '3a7f873b81f8e917ee92d1d32d7575be';
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const readResolved = spec => fs.readFileSync(require.resolve(spec, { paths: [root] }), 'utf8');
@@ -36,6 +37,7 @@ const scripts = {
 html = html.replace('/*__STYLES__*/', () => css);
 for (const [token, body] of Object.entries(scripts)) html = html.replace(token, () => body.replace(/<\/script/gi, '<\\/script'));
 html = html.replaceAll('__COAST_IMAGE__', image);
+html = html.replaceAll('__FREE_LAUNCH__', FREE_LAUNCH ? 'true' : 'false');
 if (/\/\*__[A-Z_]+__\*\//.test(html)) throw new Error('Unresolved build marker');
 fs.rmSync(out(), {recursive:true, force:true});
 fs.mkdirSync(out(), {recursive:true});
