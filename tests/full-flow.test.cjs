@@ -106,7 +106,7 @@ test('real pdf-lib dependency saves and reloads metadata',async()=>{
   pdf.addPage([120,120]);
   const bytes=await pdf.save();
   assert.ok(bytes.length>500);
-  const loaded=await RealPDFLib.PDFDocument.load(bytes);
+  const loaded=await RealPDFLib.PDFDocument.load(bytes,{updateMetadata:false});
   assert.equal(loaded.getTitle(),'ChatToPaper dependency QA');
   assert.equal(loaded.getCreator(),'ChatToPaper');
   assert.equal(loaded.getProducer(),'ChatToPaper — processed locally');
