@@ -32,7 +32,7 @@ test('utility pages stay out of the index', () => {
   assert.match(build,/robots:'noindex,follow'/);
   const cfg=JSON.parse(fs.readFileSync('vercel.json','utf8'));
   const map=new Map(cfg.headers.map(h=>[h.source,h.headers]));
-  assert.ok(map.has('/ChattoPaper.html'));
+  assert.ok(map.has('/ChatToPaper.html'));
   assert.ok(map.has('/payment-success/(.*)'));
 });
 
