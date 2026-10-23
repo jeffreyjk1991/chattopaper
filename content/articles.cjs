@@ -155,7 +155,7 @@ const published = '2026-10-22';
 const updated = '2026-10-23';
 const articles = clusters.flatMap(cluster => cluster.items.map(([title, slug, answer, keyword], index) => ({
   title, slug, category: cluster.category, answer, keyword,
-  description: `${answer} This ChattoPaper guide explains the practical workflow, limitations, privacy considerations, and what to check before printing.`,
+  description: `${answer} This ChatToPaper guide explains the practical workflow, limitations, privacy considerations, and what to check before printing.`,
   published, updated,
   order: index
 })));
