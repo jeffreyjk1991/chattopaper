@@ -1,0 +1,37 @@
+name: Build Neon Counter Function
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'neon-counter/**'
+      - '.github/workflows/build-neon-counter.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - name: Build function bundle
+        run: |
+          set -euo pipefail
+          mkdir -p neon-counter-bundle
+          cp neon-counter/index.mjs neon-counter-bundle/index.mjs
+          cd neon-counter-bundle
+          npm init -y >/dev/null 2>&1
+          npm install --omit=dev pg@8.13.1 @neon/functions@0.8.0
+          zip -qr ../neon-counter-function.zip index.mjs package.json package-lock.json node_modules
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: neon-counter-function
+          path: neon-counter-function.zip
+          if-no-files-found: error
