@@ -7,7 +7,7 @@ const home = fs.readFileSync('src/index.html','utf8');
 const vercel = JSON.parse(fs.readFileSync('vercel.json','utf8'));
 
 test('AI search crawlers and sitemap stay enabled', () => {
-  for (const bot of ['OAI-SearchBot','ChatGPT-User','GPTBot','Googlebot','Bingbot']) assert.match(build,new RegExp(bot));
+  for (const bot of ['OAI-SearchBot','ChatGPT-User','GPTBot','Googlebot','Bingbot','Google-Extended','PerplexityBot']) assert.match(build,new RegExp(bot));
   assert.match(build,/sitemap\.xml/);
   assert.match(build,/llms-full\.txt/);
 });
@@ -25,4 +25,13 @@ test('homepage exposes product entity data', () => {
 
 test('canonical path style is consistent', () => {
   assert.equal(vercel.trailingSlash,true);
+});
+
+
+test('utility pages stay out of the index', () => {
+  assert.match(build,/robots:'noindex,follow'/);
+  const cfg=JSON.parse(fs.readFileSync('vercel.json','utf8'));
+  const map=new Map(cfg.headers.map(h=>[h.source,h.headers]));
+  assert.ok(map.has('/ChattoPaper.html'));
+  assert.ok(map.has('/payment-success/(.*)'));
 });
