@@ -4,12 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'neon-counter/**'
+      - 'neon-counter/index.mjs'
       - '.github/workflows/build-neon-counter.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   bundle:
@@ -40,3 +40,22 @@ jobs:
           name: neon-counter-function
           path: neon-counter-function.zip
           if-no-files-found: error
+
+      - name: Publish temporary deploy bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          base64 -w0 neon-counter-function.zip > function.b64
+          encoded="$(base64 -w0 function.b64)"
+          current_sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/neon-counter/function.b64" --jq .sha 2>/dev/null || true)"
+          if [ -n "$current_sha" ]; then
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/neon-counter/function.b64" \
+              -f message="Update temporary Neon function bundle" \
+              -f content="$encoded" \
+              -f sha="$current_sha" >/dev/null
+          else
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/neon-counter/function.b64" \
+              -f message="Publish temporary Neon function bundle" \
+              -f content="$encoded" >/dev/null
+          fi
