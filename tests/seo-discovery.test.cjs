@@ -42,6 +42,6 @@ test('production metadata uses chattopaper.com and free launch offer', () => {
   assert.match(home,/https:\/\/chattopaper\.com\//);
   assert.doesNotMatch(home,/https:\/\/chattopaper\.vercel\.app/);
   assert.match(home,/"price":"0"/);
-  assert.match(home,/CHATTOPAPER_FREE_LAUNCH = true/);
+  assert.match(home,/CHATTOPAPER_FREE_LAUNCH = __FREE_LAUNCH__/);
   assert.match(home,/Free for a limited time/);
 });
