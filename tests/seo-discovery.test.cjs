@@ -47,11 +47,14 @@ test('production metadata uses chattopaper.com and free launch offer', () => {
 });
 
 
-test('about page reads a live PDF usage count only outside the homepage',()=>{
+test('about page reads the live PDF usage count through first-party API',()=>{
   const build=fs.readFileSync('build.cjs','utf8');
   const home=fs.readFileSync('src/index.html','utf8');
   assert.match(build,/PDFs generated since tracking started/);
-  assert.match(build,/content-range/);
-  assert.match(build,/pdf_generation_events/);
+  assert.match(build,/fetch\('\/api\/pdf-count'/);
+  assert.match(build,/pdf-generated-count/);
   assert.doesNotMatch(home,/PDFs generated since tracking started/);
+  const api=fs.readFileSync('api/pdf-count.js','utf8');
+  assert.match(api,/pdf_generation_events/);
+  assert.match(api,/count=exact/);
 });
