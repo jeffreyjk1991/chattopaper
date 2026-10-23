@@ -35,3 +35,13 @@ test('utility pages stay out of the index', () => {
   assert.ok(map.has('/ChattoPaper.html'));
   assert.ok(map.has('/payment-success/(.*)'));
 });
+
+
+test('production metadata uses chattopaper.com and free launch offer', () => {
+  const home=fs.readFileSync('src/index.html','utf8');
+  assert.match(home,/https:\/\/chattopaper\.com\//);
+  assert.doesNotMatch(home,/https:\/\/chattopaper\.vercel\.app/);
+  assert.match(home,/"price":"0"/);
+  assert.match(home,/CHATTOPAPER_FREE_LAUNCH = true/);
+  assert.match(home,/Free for a limited time/);
+});
