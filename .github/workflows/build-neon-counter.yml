@@ -24,12 +24,17 @@ jobs:
       - name: Build function bundle
         run: |
           set -euo pipefail
+          npm install --no-save pg@8.13.1 @neon/functions@0.8.0 esbuild@0.25.11
           mkdir -p neon-counter-bundle
-          cp neon-counter/index.mjs neon-counter-bundle/index.mjs
+          npx esbuild neon-counter/index.mjs \
+            --bundle \
+            --platform=node \
+            --format=esm \
+            --target=node24 \
+            --banner:js="import { createRequire } from 'module'; const require = createRequire(import.meta.url);" \
+            --outfile=neon-counter-bundle/index.mjs
           cd neon-counter-bundle
-          npm init -y >/dev/null 2>&1
-          npm install --omit=dev pg@8.13.1 @neon/functions@0.8.0
-          zip -qr ../neon-counter-function.zip index.mjs package.json package-lock.json node_modules
+          zip -q ../neon-counter-function.zip index.mjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: neon-counter-function
