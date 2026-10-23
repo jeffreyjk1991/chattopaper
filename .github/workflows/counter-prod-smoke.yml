@@ -1,0 +1,38 @@
+name: Counter Production Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/counter-prod-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production PDF counter
+        run: |
+          set -euo pipefail
+          uuid='9f9f2b7c-6b31-4d88-9a9d-4be94ca66f10'
+          before_json="$(curl --retry 3 --retry-delay 2 --fail-with-body -sS https://chattopaper.com/api/pdf-count)"
+          before="$(printf '%s' "$before_json" | jq -er '.count')"
+          echo "before=$before"
+          test "$before" -ge 2
+
+          first_json="$(curl --retry 3 --retry-delay 2 --fail-with-body -sS -X POST https://chattopaper.com/api/pdf-count             -H 'Origin: https://chattopaper.com'             -H 'Content-Type: application/json'             --data "{\"eventId\":\"$uuid\"}")"
+          first="$(printf '%s' "$first_json" | jq -er '.count')"
+          echo "after_first=$first"
+          test "$first" -eq "$((before+1))"
+
+          second_json="$(curl --retry 3 --retry-delay 2 --fail-with-body -sS -X POST https://chattopaper.com/api/pdf-count             -H 'Origin: https://chattopaper.com'             -H 'Content-Type: application/json'             --data "{\"eventId\":\"$uuid\"}")"
+          second="$(printf '%s' "$second_json" | jq -er '.count')"
+          echo "after_duplicate=$second"
+          test "$second" -eq "$first"
+
+          final_json="$(curl --retry 3 --retry-delay 2 --fail-with-body -sS https://chattopaper.com/api/pdf-count)"
+          final="$(printf '%s' "$final_json" | jq -er '.count')"
+          echo "final=$final"
+          test "$final" -eq "$first"
