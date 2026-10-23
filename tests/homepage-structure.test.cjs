@@ -11,7 +11,7 @@ test('minimal homepage keeps converter-critical controls', () => {
 });
 
 test('homepage is intentionally minimal', () => {
-  assert.match(html, /Turn your chat into a clean PDF\./);
+  assert.match(html, /Turn your WhatsApp chat into a clean PDF\./);
   assert.match(html, /Customize PDF/);
   assert.doesNotMatch(html, /BIG FEELINGS\. SMALL PRICE\./);
   assert.doesNotMatch(html, /LESS FUSS\. MORE FOREVER\./);
