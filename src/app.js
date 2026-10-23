@@ -1,4 +1,4 @@
-/* ChattoPaper application. No fetch, sockets, storage, analytics or accounts. */
+/* ChattoPaper application. Chat files stay in memory; localStorage is used only for short-lived payment handoff metadata. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -7,11 +7,14 @@
     active: false, sample: true, doc: null, page: 0, revision: 0, importRevision: 0,
     dirty: false, importing: false, rendering: false, exporting: false,
     dateConfirmed: true, timer: null, toastTimer: null, downloadURL: null,
-    previewRevision: 0, sampleSource: null, uiWarnings: [], paymentUnlocked: false, paymentRef: null
+    previewRevision: 0, sampleSource: null, uiWarnings: [], paymentUnlocked: false, paymentRef: null, paymentSessionId: null, downloadName: null
   };
   const formatNumber = n => new Intl.NumberFormat('en').format(n || 0);
   const stripePaymentLink = window.CHATTOPAPER_STRIPE_PAYMENT_LINK || '';
   const stripeTestMode = Boolean(window.CHATTOPAPER_STRIPE_TEST_MODE);
+  const PAYMENT_PENDING_KEY = 'chattopaper.payment.pending.v2';
+  const PAYMENT_SUCCESS_KEY = 'chattopaper.payment.success.v2';
+  const PAYMENT_CHANNEL = 'chattopaper-payments-v2';
   const shortDate = key => key ? new Intl.DateTimeFormat('en', {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}).format(new Date(key+'T12:00:00Z')) : 'Unknown date';
   const icon = name => { const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','icon'); const use=document.createElementNS('http://www.w3.org/2000/svg','use'); use.setAttribute('href','#i-'+name);svg.append(use);return svg; };
   const txt = (tag, value, className) => {const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
@@ -30,6 +33,7 @@
   function revokeMedia() {
     releaseMediaURLs(state.mediaURLs);
     if(state.downloadURL){releaseURL(state.downloadURL);state.downloadURL=null;}
+    state.downloadName=null;
     $('download-ready-link').hidden=true;$('download-ready-link').removeAttribute('href');
   }
   function blobAsDataURL(blob) {
@@ -44,6 +48,19 @@
   async function localBlobURL(blob) {
     try{if(typeof URL.createObjectURL==='function')return URL.createObjectURL(blob);}catch(_){/* Use FileReader in restricted webviews. */}
     return blobAsDataURL(blob);
+  }
+  function clearPaymentHandoff() {
+    state.paymentUnlocked=false;state.paymentRef=null;state.paymentSessionId=null;
+    try{localStorage.removeItem(PAYMENT_PENDING_KEY);localStorage.removeItem(PAYMENT_SUCCESS_KEY);}catch(_){}
+  }
+  function readStoredPaymentSuccess() {
+    try {
+      const raw=localStorage.getItem(PAYMENT_SUCCESS_KEY);
+      if(!raw)return null;
+      const value=JSON.parse(raw);
+      if(!value||Date.now()-Number(value.ts||0)>15*60*1000)return null;
+      return value;
+    } catch(_){ return null; }
   }
   function updatePickerState() {
     for(const id of ['file-input','replace-file-input'])$(id).disabled=state.importing;
@@ -130,6 +147,7 @@
     const media=await prepareMedia(prepared.linked);
     if(token!==state.importRevision){releaseMediaURLs(media.urls);return false;}
     clearTimeout(state.timer);state.revision++;disposeDoc();revokeMedia();resetSettings();
+    if(active&&!sample)clearPaymentHandoff();
     state.source=source;state.parsed=prepared.parsed;state.linked=prepared.linked;
     state.mediaURLs=media.urls;state.messages=media.messages;state.active=active;state.sample=sample;state.page=0;
     state.dateConfirmed=!prepared.parsed.ambiguousDates;state.uiWarnings=[];
@@ -172,7 +190,7 @@
   async function clearConversation() {
     const token=++state.importRevision;state.importing=false;$('file-input').value='';$('replace-file-input').value='';updatePickerState();
     // Clear private data immediately, independently of the optional sample.
-    clearTimeout(state.timer);state.revision++;disposeDoc();revokeMedia();state.source=null;state.parsed=null;state.linked=null;state.messages=[];state.active=false;state.uiWarnings=[];state.dateConfirmed=true;state.page=0;state.rendering=false;state.dirty=false;
+    clearTimeout(state.timer);state.revision++;disposeDoc();revokeMedia();clearPaymentHandoff();state.source=null;state.parsed=null;state.linked=null;state.messages=[];state.active=false;state.uiWarnings=[];state.dateConfirmed=true;state.page=0;state.rendering=false;state.dirty=false;
     resetSettings();$('document-title').value='';$('file-name').textContent='';$('file-name').removeAttribute('title');$('file-meta').textContent='';updateDates(true);updateParticipants();renderWarnings();setError('');
     $('preview-transcript').textContent='';$('preview-canvas').width=1;$('preview-canvas').height=1;$('preview-loading').hidden=true;
     $('step-customize').classList.remove('current');$('step-download').classList.remove('current');$('preview-tag').textContent='No chat';
@@ -319,25 +337,40 @@
       try{state.paymentRef=crypto.randomUUID().replace(/-/g,'');}
       catch(_){state.paymentRef=String(Date.now())+Math.random().toString(36).slice(2);}
     }
+    try{localStorage.setItem(PAYMENT_PENDING_KEY,JSON.stringify({paymentRef:state.paymentRef,ts:Date.now()}));localStorage.removeItem(PAYMENT_SUCCESS_KEY);}catch(_){}
     const joiner=stripePaymentLink.includes('?')?'&':'?';
     const url=stripePaymentLink+joiner+'client_reference_id='+encodeURIComponent(state.paymentRef);
     track('stripe_checkout_opened',{mode:stripeTestMode?'test':'live'});
-    const paymentWindow=window.open(url,'chattopaper-stripe','noopener,noreferrer');
-    if(!paymentWindow){toast('Your browser blocked the Stripe tab. Allow pop-ups for ChattoPaper and try again.',true);return;}
-    $('download-status').textContent='Stripe Checkout opened in a new tab. Your chat stays here on this device.';
+    const anchor=document.createElement('a');anchor.href=url;anchor.target='_blank';anchor.rel='noopener noreferrer';anchor.hidden=true;
+    document.body.append(anchor);anchor.click();anchor.remove();
+    $('download-status').textContent='Stripe Checkout opened in a new tab. After payment, this tab will prepare your PDF automatically.';
   }
-  function unlockPayment(sessionId) {
-    if(!/^cs_(?:test|live)_[A-Za-z0-9_]+$/.test(String(sessionId||'')))return;
-    state.paymentUnlocked=true;
+  function validStripeSession(sessionId) { return /^cs_(?:test|live)_[A-Za-z0-9_]+$/.test(String(sessionId||'')); }
+  function paymentMatchesCurrentChat(paymentRef) {
+    if(!state.paymentRef||!paymentRef)return true;
+    return String(paymentRef)===String(state.paymentRef);
+  }
+  async function unlockPayment(sessionId,paymentRef) {
+    if(!validStripeSession(sessionId)||!paymentMatchesCurrentChat(paymentRef))return;
+    if(state.paymentUnlocked&&state.paymentSessionId===sessionId)return;
+    state.paymentUnlocked=true;state.paymentSessionId=sessionId;
+    try{localStorage.removeItem(PAYMENT_PENDING_KEY);localStorage.removeItem(PAYMENT_SUCCESS_KEY);}catch(_){}
     if(!$('download-dialog').open)openDownload();
-    $('download-status').textContent=stripeTestMode?'Test payment returned from Stripe. Download is unlocked for this browser session.':'Payment returned from Stripe. Download is unlocked for this browser session.';
-    $('download-confirm').replaceChildren(document.createTextNode('Download PDF'),icon('download'));
+    $('download-status').textContent='Payment complete. Preparing your PDF now…';
+    $('download-confirm').replaceChildren(document.createTextNode('Preparing PDF…'));
+    $('download-confirm').disabled=true;
     track('payment_returned',{mode:stripeTestMode?'test':'live'});
-    toast(stripeTestMode?'Stripe test payment completed. PDF unlocked.':'Payment completed. PDF unlocked.');
+    toast(stripeTestMode?'Stripe test payment completed. Preparing your PDF.':'Payment completed. Preparing your PDF.');
+    await createPDF({attemptSave:false});
   }
-  async function downloadPDF() {
-    if(!state.paymentUnlocked){beginStripePayment();return;}
+  function savePreparedPDF() {
+    if(!state.downloadURL)return false;
+    const anchor=document.createElement('a');anchor.href=state.downloadURL;anchor.download=state.downloadName||'ChattoPaper conversation.pdf';
+    document.body.append(anchor);anchor.click();anchor.remove();return true;
+  }
+  async function createPDF({attemptSave=true}={}) {
     if(state.exporting||!state.doc||!state.dateConfirmed)return;
+    if(state.downloadURL){if(attemptSave)savePreparedPDF();return;}
     const doc=state.doc;state.exporting=true;
     const dialog=$('download-dialog');const button=$('download-confirm');const close=dialog.querySelector('.dialog-close');
     button.disabled=true;close.disabled=true;$('download-return').disabled=true;$('download-progress').hidden=false;$('download-progress').value=0;
@@ -348,19 +381,24 @@
       });
       if(state.downloadURL)releaseURL(state.downloadURL);
       state.downloadURL=await localBlobURL(blob);
-      const anchor=document.createElement('a');anchor.href=state.downloadURL;
       const name=doc.options.title.replace(/[<>:"/\\|?*\x00-\x1F]/g,'').replace(/\s+/g,' ').trim().slice(0,80)||'My conversation';
-      anchor.download=name+'.pdf';document.body.append(anchor);anchor.click();anchor.remove();
-      $('download-ready-link').href=state.downloadURL;$('download-ready-link').download=name+'.pdf';$('download-ready-link').hidden=false;
+      state.downloadName=name+'.pdf';
+      $('download-ready-link').href=state.downloadURL;$('download-ready-link').download=state.downloadName;$('download-ready-link').hidden=false;
       const mb=blob.size/1024/1024;
-      $('download-status').textContent=`Your ${doc.pages.length}-page PDF is ready (${mb<1?Math.round(blob.size/1024)+' KB':mb.toFixed(1)+' MB'}). Check your downloads. If your browser did not save it, use the direct link below.`;
-      track('pdf_downloaded',{pages:doc.pages.length,bytes:blob.size});
-      button.replaceChildren(document.createTextNode('Download again'),icon('download'));
-      toast('Your PDF is ready. A little piece of forever.');
+      $('download-status').textContent=`Payment complete. Your ${doc.pages.length}-page PDF is ready (${mb<1?Math.round(blob.size/1024)+' KB':mb.toFixed(1)+' MB'}). Tap “Save PDF” below.`;
+      track('pdf_ready',{pages:doc.pages.length,bytes:blob.size});
+      button.replaceChildren(document.createTextNode('Save PDF'),icon('download'));
+      if(attemptSave){savePreparedPDF();track('pdf_downloaded',{pages:doc.pages.length,bytes:blob.size});}
+      else toast('Your PDF is ready to save.');
     }catch(error){
       $('download-status').textContent=error.message||'The PDF could not be generated. Try a smaller date range.';
-      button.replaceChildren(document.createTextNode('Try download again'),icon('download'));toast('The download could not finish. Please try again.',true);
+      button.replaceChildren(document.createTextNode('Try download again'),icon('download'));toast('The PDF could not finish. Please try again.',true);
     }finally{state.exporting=false;button.disabled=false;close.disabled=false;$('download-return').disabled=false;updateDownloadEnabled();}
+  }
+  async function downloadPDF() {
+    if(!state.paymentUnlocked){beginStripePayment();return;}
+    if(state.downloadURL){if(savePreparedPDF())track('pdf_downloaded',{prepared:true});return;}
+    await createPDF({attemptSave:true});
   }
   function chooseGuide(which,focus=false) {
     for(const name of ['iphone','android']){
@@ -404,11 +442,14 @@
     });
     // A persisted page keeps its object URLs for browser Back. Closing a tab
     // releases its memory; explicit clearing/replacement revokes URLs above.
-    window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data?.type==='chattopaper-stripe-success')unlockPayment(event.data.sessionId);});
+    window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data?.type==='chattopaper-stripe-success')unlockPayment(event.data.sessionId,event.data.paymentRef);});
+    window.addEventListener('storage',event=>{if(event.key===PAYMENT_SUCCESS_KEY&&event.newValue){try{const data=JSON.parse(event.newValue);unlockPayment(data.sessionId,data.paymentRef);}catch(_){}}});
     if(typeof BroadcastChannel==='function'){
-      const payments=new BroadcastChannel('chattopaper-payments');
-      payments.addEventListener('message',event=>{if(event.data?.type==='success')unlockPayment(event.data.sessionId);});
+      const payments=new BroadcastChannel(PAYMENT_CHANNEL);
+      payments.addEventListener('message',event=>{if(event.data?.type==='success')unlockPayment(event.data.sessionId,event.data.paymentRef);});
     }
+    const checkReturnedPayment=()=>{const data=readStoredPaymentSuccess();if(data)unlockPayment(data.sessionId,data.paymentRef);};
+    window.addEventListener('focus',checkReturnedPayment);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReturnedPayment();});
     window.addEventListener('pagehide',event=>{if(!event.persisted){disposeDoc();revokeMedia();}});
   }
   async function initialize() {
@@ -419,10 +460,14 @@
       const params=new URLSearchParams(location.search);
       const returnedSession=params.get('session_id');
       if(params.get('stripe')==='success'&&returnedSession){
-        try{if(window.opener&&!window.opener.closed)window.opener.postMessage({type:'chattopaper-stripe-success',sessionId:returnedSession},location.origin);}catch(_){}
-        try{if(typeof BroadcastChannel==='function'){const channel=new BroadcastChannel('chattopaper-payments');channel.postMessage({type:'success',sessionId:returnedSession});channel.close();}}catch(_){}
-        $('runtime-status').hidden=false;$('runtime-status').querySelector('p').textContent=stripeTestMode?'Stripe test checkout returned successfully. Go back to the original ChattoPaper tab, where your conversation is still loaded.':'Payment returned successfully. Go back to the original ChattoPaper tab, where your conversation is still loaded.';
+        // Backward-compatible handling for older Stripe redirects still cached by Stripe.
+        let paymentRef=null;try{paymentRef=JSON.parse(localStorage.getItem(PAYMENT_PENDING_KEY)||'null')?.paymentRef||null;}catch(_){}
+        const payload={type:'chattopaper-stripe-success',sessionId:returnedSession,paymentRef,ts:Date.now()};
+        try{localStorage.setItem(PAYMENT_SUCCESS_KEY,JSON.stringify(payload));}catch(_){}
+        try{if(typeof BroadcastChannel==='function'){const channel=new BroadcastChannel(PAYMENT_CHANNEL);channel.postMessage({type:'success',...payload});channel.close();}}catch(_){}
+        location.replace('/payment-success/?session_id='+encodeURIComponent(returnedSession));return;
       }
+      const storedSuccess=readStoredPaymentSuccess();if(storedSuccess)unlockPayment(storedSuccess.sessionId,storedSuccess.paymentRef);
       document.documentElement.dataset.appReady='true';
     }catch(error){
       $('runtime-status').hidden=false;$('runtime-status').querySelector('p').textContent='This viewer could not start the converter. Open the downloaded HTML in a full browser with JavaScript enabled. '+error.message;
