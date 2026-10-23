@@ -1,4 +1,4 @@
-/* ChattoPaper application. Chat files stay in memory; localStorage is used only for short-lived payment handoff metadata. */
+/* ChatToPaper application. Chat files stay in memory; localStorage is used only for short-lived payment handoff metadata. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -365,7 +365,7 @@
   }
   function savePreparedPDF() {
     if(!state.downloadURL)return false;
-    const anchor=document.createElement('a');anchor.href=state.downloadURL;anchor.download=state.downloadName||'ChattoPaper conversation.pdf';
+    const anchor=document.createElement('a');anchor.href=state.downloadURL;anchor.download=state.downloadName||'ChatToPaper conversation.pdf';
     document.body.append(anchor);anchor.click();anchor.remove();return true;
   }
   async function createPDF({attemptSave=true}={}) {
