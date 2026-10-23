@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const root = __dirname;
-const SITE = (process.env.SITE_URL || 'https://chattopaper.vercel.app').replace(/\/+$/, '');
+const SITE = (process.env.SITE_URL || 'https://chattopaper.com').replace(/\/+$/, '');
 const UPDATED = '2026-10-23';
 const INDEXNOW_KEY = '3a7f873b81f8e917ee92d1d32d7575be';
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
