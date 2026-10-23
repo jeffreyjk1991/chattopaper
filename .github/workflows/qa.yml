@@ -9,16 +9,27 @@ permissions:
   contents: read
 
 jobs:
-  test-build:
+  test-build-e2e:
     runs-on: ubuntu-latest
     env:
       SITE_URL: https://chattopaper.com
       FREE_LAUNCH: "true"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24
-      - run: npm install
-      - run: npm test
-      - run: npm run build
+      - name: Install app dependencies
+        run: npm install
+      - name: Unit and integration tests
+        run: npm test
+      - name: Build production static site
+        run: node build.cjs
+      - name: Install browser QA dependency
+        run: npm install --no-save playwright@1.62.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser end-to-end flow
+        run: node tests/e2e.cjs
