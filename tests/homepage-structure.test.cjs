@@ -11,7 +11,7 @@ test('minimal homepage keeps converter-critical controls', () => {
 });
 
 test('homepage is intentionally minimal', () => {
-  assert.match(html, /ChatToPaper turns your WhatsApp chat into a clean PDF\./);
+  assert.match(html, /Free WhatsApp to PDF Converter/);
   assert.match(html, /Customize PDF/);
   assert.doesNotMatch(html, /BIG FEELINGS\. SMALL PRICE\./);
   assert.doesNotMatch(html, /LESS FUSS\. MORE FOREVER\./);
