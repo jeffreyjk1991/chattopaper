@@ -153,13 +153,54 @@ const clusters = [
 
 const published = '2026-10-22';
 const updated = '2026-10-23';
-const articles = clusters.flatMap(cluster => cluster.items.map(([title, slug, answer, keyword], index) => ({
-  title, slug, category: cluster.category, answer, keyword,
-  description: answer,
-  published, updated,
-  order: index
-})));
-if (articles.length !== 100) throw new Error(`Expected 100 articles, got ${articles.length}`);
+
+// Consolidated search library: keep one strong page per distinct user intent.
+// Retired overlapping URLs are permanently redirected in vercel.json so any
+// existing links/signals flow into the closest surviving guide.
+const KEEP = new Set([
+  'convert-whatsapp-chat-to-pdf',
+  'convert-whatsapp-zip-to-pdf',
+  'whatsapp-txt-to-pdf',
+  'whatsapp-export-to-pdf-what-is-preserved',
+  'best-way-archive-whatsapp-conversation',
+  'export-whatsapp-chat-iphone',
+  'export-whatsapp-chat-android',
+  'print-whatsapp-chat-with-photos',
+  'whatsapp-photos-missing-from-pdf',
+  'whatsapp-export-media-omitted',
+  'whatsapp-voice-notes-pdf',
+  'whatsapp-pdf-a4-vs-letter',
+  'whatsapp-pdf-chat-bubbles-vs-transcript',
+  'print-whatsapp-messages-without-screenshots',
+  'whatsapp-conversation-keepsake-book',
+  'whatsapp-export-zip-wont-open',
+  'whatsapp-export-wrong-dates',
+  'whatsapp-export-too-large-convert',
+  'whatsapp-txt-strange-characters',
+  'is-whatsapp-pdf-converter-safe',
+  'whatsapp-pdf-legal-evidence',
+  'preserve-whatsapp-conversation-records',
+  'whatsapp-advanced-chat-privacy-export',
+  'whatsapp-pdf-vs-screenshots',
+  'whatsapp-txt-vs-pdf',
+  'local-vs-cloud-whatsapp-pdf-converter',
+  'whatsapp-export-date-range',
+  'does-whatsapp-export-include-deleted-messages',
+  'can-you-print-whatsapp-group-chats',
+  'easiest-way-print-whatsapp-messages'
+]);
+
+const articles = clusters
+  .flatMap(cluster => cluster.items.map(([title, slug, answer, keyword], index) => ({
+    title, slug, category: cluster.category, answer, keyword,
+    description: answer,
+    published, updated,
+    order: index
+  })))
+  .filter(article => KEEP.has(article.slug));
+
+if (articles.length !== 30) throw new Error(`Expected 30 consolidated articles, got ${articles.length}`);
+
 const detailed = require('./detailed-guides.cjs');
 for (const article of articles) {
   if (detailed[article.slug]) Object.assign(article, detailed[article.slug]);
