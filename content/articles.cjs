@@ -135,6 +135,17 @@ const clusters = [
     ]
   },
   {
+    category: 'Business records',
+    items: [
+      ['How to Keep WhatsApp Customer Orders as Business Records', 'whatsapp-customer-orders-business-records', 'If customers place or confirm orders in WhatsApp, export the completed conversation and keep a readable PDF alongside your normal order, payment and accounting records. The PDF creates a convenient paper trail of what was requested, changed and confirmed.', 'whatsapp orders business records'],
+      ['How to Save WhatsApp Quotes and Customer Approvals as a PDF', 'whatsapp-quotes-customer-approvals-pdf', 'When a customer approves a quote, scope, price or change in WhatsApp, a dated PDF of the relevant conversation can make the decision easier to review later. Keep it with the formal quote, invoice or job record rather than treating chat alone as your accounting system.', 'whatsapp quote approval record'],
+      ['How to Keep WhatsApp Supplier Orders and Purchase Discussions', 'whatsapp-supplier-orders-purchase-records', 'Small businesses often confirm quantities, substitutions, delivery dates and prices with suppliers in WhatsApp. Exporting the conversation to PDF gives you a readable reference to store with purchase orders, receipts and inventory records.', 'whatsapp supplier order records'],
+      ['How Contractors Can Save WhatsApp Job Instructions and Change Approvals', 'whatsapp-contractor-job-records', 'Contractors can preserve customer instructions, photos, scheduling details and approved changes from a WhatsApp job thread in one readable PDF. Keep the PDF with estimates, invoices and signed agreements for a clearer project history.', 'whatsapp contractor job records'],
+      ['How Property Managers Can Save WhatsApp Tenant and Vendor Conversations', 'whatsapp-property-management-records', 'Property managers often receive repair requests, access instructions, photos and vendor updates through WhatsApp. A PDF export can create a readable record for the property file while the original source export is retained separately.', 'whatsapp property management records'],
+      ['How Freelancers and Service Businesses Can Save WhatsApp Client Records', 'whatsapp-freelancer-client-records', 'Freelancers and service businesses can preserve project requirements, revisions, delivery confirmations and client approvals from WhatsApp as a PDF. Store it with the proposal, invoice and project files so important decisions are not buried in a chat thread.', 'whatsapp client records freelancer']
+    ]
+  },
+  {
     category: 'Search questions',
     items: [
       ['Can You Export WhatsApp Chats to PDF?', 'can-you-export-whatsapp-chats-to-pdf', 'Yes, but WhatsApp itself generally exports chat history as text with optional media rather than a styled PDF. A separate formatting step turns that export into a printable PDF.', 'export whatsapp to pdf'],
@@ -187,7 +198,13 @@ const KEEP = new Set([
   'whatsapp-export-date-range',
   'does-whatsapp-export-include-deleted-messages',
   'can-you-print-whatsapp-group-chats',
-  'easiest-way-print-whatsapp-messages'
+  'easiest-way-print-whatsapp-messages',
+  'whatsapp-customer-orders-business-records',
+  'whatsapp-quotes-customer-approvals-pdf',
+  'whatsapp-supplier-orders-purchase-records',
+  'whatsapp-contractor-job-records',
+  'whatsapp-property-management-records',
+  'whatsapp-freelancer-client-records'
 ]);
 
 const articles = clusters
@@ -199,7 +216,7 @@ const articles = clusters
   })))
   .filter(article => KEEP.has(article.slug));
 
-if (articles.length !== 30) throw new Error(`Expected 30 consolidated articles, got ${articles.length}`);
+if (articles.length !== 36) throw new Error(`Expected 36 focused articles, got ${articles.length}`);
 
 const detailed = require('./detailed-guides.cjs');
 for (const article of articles) {
