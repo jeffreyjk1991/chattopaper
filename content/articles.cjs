@@ -2,7 +2,7 @@ const clusters = [
   {
     category: 'Convert & save',
     items: [
-      ['How to Convert a WhatsApp Chat to PDF', 'convert-whatsapp-chat-to-pdf', 'The simplest reliable workflow is: export one chat from WhatsApp, include media if you need photos, open the export in a converter, check the date range and preview, then create the PDF.', 'whatsapp chat to pdf'],
+      ['How to Convert a WhatsApp Chat to PDF (iPhone, Android & Photos)', 'convert-whatsapp-chat-to-pdf', 'Export the chat from WhatsApp, choose media if photos matter, open the TXT or ZIP in a converter, verify dates and attachments in the preview, then download the PDF. ChatToPaper processes the export in your browser and is free during launch.', 'whatsapp chat to pdf'],
       ['How to Convert a WhatsApp ZIP to PDF', 'convert-whatsapp-zip-to-pdf', 'A WhatsApp ZIP usually contains the conversation text plus exported media. A good converter should read the chat text, match image filenames, and preserve each photo near the message that referenced it.', 'whatsapp zip to pdf'],
       ['How to Save a WhatsApp Conversation as a PDF', 'save-whatsapp-conversation-as-pdf', 'Export the conversation first, then convert the exported TXT or ZIP into a paginated PDF. This is more complete than stitching screenshots when the chat is long.', 'save whatsapp conversation pdf'],
       ['How to Download a WhatsApp Chat as a Printable Document', 'download-whatsapp-chat-printable-document', 'WhatsApp exports chat history as text, not as a polished printable document. The practical route is to export the chat and format that export into a PDF with page breaks, sender labels, dates, and photos.', 'printable whatsapp chat'],
