@@ -1,6 +1,10 @@
 # ChatToPaper
 
-ChatToPaper turns a WhatsApp chat export into a printable PDF with messages, timestamps, sender names, and supported photos in their conversation positions.
+**Live site:** https://chattopaper.com/
+
+ChatToPaper is a free browser-based WhatsApp-to-PDF converter that turns exported WhatsApp chats into printable PDFs with messages, timestamps, sender names, and supported photos in their conversation positions.
+
+Use it at **https://chattopaper.com/** or read the complete guide: **https://chattopaper.com/blog/convert-whatsapp-chat-to-pdf/**.
 
 ## Product
 
@@ -13,7 +17,7 @@ ChatToPaper turns a WhatsApp chat export into a printable PDF with messages, tim
 
 ## Discovery and analytics
 
-- 100 focused WhatsApp export/PDF articles generated as static HTML.
+- 36 focused WhatsApp export/PDF and small-business record-keeping guides generated as static HTML.
 - Blog category hubs and internal linking.
 - `sitemap.xml`, `robots.txt`, `llms.txt`, RSS, canonical URLs, Open Graph metadata, Article/WebApplication structured data.
 - OAI-SearchBot and GPTBot explicitly allowed in `robots.txt`.
@@ -38,3 +42,10 @@ The production static site is generated in `dist/`. Vercel is configured through
 Product name: **ChatToPaper**.
 
 ChatToPaper is an independent formatting tool and is not affiliated with, endorsed by, or sponsored by WhatsApp or Meta.
+
+## Useful links
+
+- [Free WhatsApp to PDF converter](https://chattopaper.com/)
+- [How to convert a WhatsApp chat to PDF](https://chattopaper.com/blog/convert-whatsapp-chat-to-pdf/)
+- [WhatsApp chat to PDF with photos](https://chattopaper.com/blog/print-whatsapp-chat-with-photos/)
+- [WhatsApp customer orders as business records](https://chattopaper.com/blog/whatsapp-customer-orders-business-records/)
