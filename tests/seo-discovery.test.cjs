@@ -50,7 +50,7 @@ test('production metadata uses chattopaper.com and free launch offer', () => {
 test('about page reads the live PDF usage count through first-party API',()=>{
   const build=fs.readFileSync('build.cjs','utf8');
   const home=fs.readFileSync('src/index.html','utf8');
-  assert.match(build,/PDFs generated since tracking started/);
+  assert.match(build,/PDFs generated today/);
   assert.match(build,/fetch\('\/api\/pdf-count'/);
   assert.match(build,/pdf-generated-count/);
   assert.doesNotMatch(home,/PDFs generated since tracking started/);
