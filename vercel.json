@@ -67,6 +67,356 @@
   "trailingSlash": true,
   "redirects": [
     {
+      "source": "/blog/save-whatsapp-conversation-as-pdf/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/download-whatsapp-chat-printable-document/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/turn-whatsapp-messages-into-document/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/make-pdf-from-one-whatsapp-chat/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-messages-pdf-dates-times/",
+      "destination": "/blog/whatsapp-export-to-pdf-what-is-preserved/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/print-whatsapp-conversation-iphone/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/save-whatsapp-messages-pdf-iphone/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-iphone-export-with-media/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/find-whatsapp-export-iphone-files/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/iphone-whatsapp-export-no-photos/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/print-part-whatsapp-chat-iphone/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/make-whatsapp-chat-book-iphone/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/export-long-whatsapp-chat-iphone/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/iphone-whatsapp-chat-to-pdf-with-photos/",
+      "destination": "/blog/export-whatsapp-chat-iphone/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/print-whatsapp-conversation-android/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/save-whatsapp-messages-pdf-android/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-android-export-with-media/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/android-whatsapp-export-missing-images/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/print-date-range-whatsapp-android/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/android-whatsapp-txt-to-pdf/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/android-whatsapp-group-chat-pdf/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/android-whatsapp-chat-archive/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/android-whatsapp-chat-to-pdf-with-photos/",
+      "destination": "/blog/export-whatsapp-chat-android/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-zip-to-pdf-with-photos/",
+      "destination": "/blog/print-whatsapp-chat-with-photos/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-photo-filenames-match-messages/",
+      "destination": "/blog/whatsapp-photos-missing-from-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-videos-printable-pdf/",
+      "destination": "/blog/whatsapp-photos-missing-from-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-stickers-pdf/",
+      "destination": "/blog/print-whatsapp-chat-with-photos/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-photos-correct-order/",
+      "destination": "/blog/whatsapp-photos-missing-from-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/check-whatsapp-export-includes-media/",
+      "destination": "/blog/whatsapp-photos-missing-from-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/best-font-size-printed-whatsapp-chat/",
+      "destination": "/blog/whatsapp-pdf-chat-bubbles-vs-transcript/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/make-long-whatsapp-pdf-readable/",
+      "destination": "/blog/whatsapp-pdf-chat-bubbles-vs-transcript/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/print-whatsapp-conversation-double-sided/",
+      "destination": "/blog/easiest-way-print-whatsapp-messages/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/print-whatsapp-one-month/",
+      "destination": "/blog/easiest-way-print-whatsapp-messages/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/reduce-whatsapp-pdf-page-count/",
+      "destination": "/blog/whatsapp-pdf-chat-bubbles-vs-transcript/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/preview-whatsapp-pdf-before-download/",
+      "destination": "/blog/whatsapp-pdf-chat-bubbles-vs-transcript/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-messages-out-of-order-pdf/",
+      "destination": "/blog/whatsapp-export-wrong-dates/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-pdf-missing-photo-placeholders/",
+      "destination": "/blog/whatsapp-photos-missing-from-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-export-multiple-txt-files/",
+      "destination": "/blog/whatsapp-txt-strange-characters/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-pdf-blank/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-upload-file-preview-viewer/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-pdf-wrong-time-format/",
+      "destination": "/blog/whatsapp-export-wrong-dates/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/local-browser-processing-whatsapp/",
+      "destination": "/blog/is-whatsapp-pdf-converter-safe/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/share-whatsapp-pdf-privacy/",
+      "destination": "/blog/preserve-whatsapp-conversation-records/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-pdf-converter-red-flags/",
+      "destination": "/blog/preserve-whatsapp-conversation-records/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/remove-sensitive-messages-printable-chat/",
+      "destination": "/blog/preserve-whatsapp-conversation-records/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/do-whatsapp-pdf-converters-store-photos/",
+      "destination": "/blog/is-whatsapp-pdf-converter-safe/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/private-whatsapp-archive-offline/",
+      "destination": "/blog/is-whatsapp-pdf-converter-safe/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/save-whatsapp-conversation-loved-one/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/print-family-whatsapp-group-chat/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/wedding-whatsapp-chat-keepsake/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/travel-whatsapp-messages-photos-pdf/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/long-distance-whatsapp-chat-book/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/customer-whatsapp-conversation-records/",
+      "destination": "/blog/preserve-whatsapp-conversation-records/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-project-discussion-pdf/",
+      "destination": "/blog/preserve-whatsapp-conversation-records/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-chat-pdf-gift/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/parenting-whatsapp-memory-book/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/archive-important-whatsapp-business-messages/",
+      "destination": "/blog/preserve-whatsapp-conversation-records/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-pdf-photos-vs-text-only/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/free-vs-paid-whatsapp-pdf-converter/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-chat-book-vs-pdf/",
+      "destination": "/blog/whatsapp-conversation-keepsake-book/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/a4-vs-us-letter-whatsapp-pdf/",
+      "destination": "/blog/whatsapp-pdf-a4-vs-letter/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/chat-bubble-vs-transcript-records/",
+      "destination": "/blog/whatsapp-pdf-chat-bubbles-vs-transcript/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/one-time-vs-subscription-whatsapp-pdf/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/whatsapp-pdf-vs-word-document/",
+      "destination": "/blog/whatsapp-txt-vs-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/can-you-export-whatsapp-chats-to-pdf/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/can-you-print-entire-whatsapp-conversation/",
+      "destination": "/blog/easiest-way-print-whatsapp-messages/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/can-you-export-whatsapp-chats-with-photos/",
+      "destination": "/blog/print-whatsapp-chat-with-photos/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/save-whatsapp-chat-without-screenshots/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/does-whatsapp-export-include-timestamps/",
+      "destination": "/blog/convert-whatsapp-chat-to-pdf/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/can-you-convert-whatsapp-chats-offline/",
+      "destination": "/blog/local-vs-cloud-whatsapp-pdf-converter/",
+      "permanent": true
+    },
+    {
       "source": "/ChatToPaper.html",
       "destination": "/",
       "permanent": true
