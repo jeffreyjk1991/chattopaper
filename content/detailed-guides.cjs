@@ -55,5 +55,59 @@ module.exports = {
       ['Print a test before the whole conversation', `<ol class="steps"><li>Create the PDF and open the downloaded file in a PDF viewer.</li><li>Choose one page with photos and one with dense text as a test.</li><li>Check paper size, orientation and the printer’s scaling preview. If the preview clips an edge, adjust the print settings before continuing.</li><li>Inspect text readability and photo quality on the printed samples.</li><li>Print the remaining pages only after the test looks right.</li></ol><p>The PDF cannot add detail to a low-resolution source image. For a photo book or paid print service, inspect the PDF against that service’s own specifications before placing an order.</p>`]
     ],
     faq: [['Will videos and voice notes print?', 'They cannot play on paper. ChatToPaper preserves unsupported attachment references or placeholders; keep the original audio and video files separately.'], ['Can I print just one month?', 'Yes, if that month is present in the imported export. Set the start and end dates in Customize PDF, check the preview and create the shortened PDF.']]
+  },
+  'whatsapp-customer-orders-business-records': {
+    description: 'Create a readable WhatsApp paper trail for customer orders, changes and confirmations, while keeping invoices, receipts and accounting records separate.',
+    sections: [
+      ['When this helps', `<p>Many small businesses receive order details through WhatsApp: product choices, quantities, delivery addresses, substitutions, pickup times, payment confirmations and last-minute changes. Those details can become hard to find once the chat moves on.</p><p>A PDF copy gives you a readable snapshot of the conversation to store with the order record. It is best treated as supporting documentation, not as a substitute for invoices, receipts, bookkeeping or signed contracts.</p>`],
+      ['A simple record-keeping workflow', `<ol class="steps"><li>Complete the customer conversation in WhatsApp.</li><li>Export that chat and keep the original export unchanged.</li><li>Convert it in <a href="/#converter">ChatToPaper</a>, keeping names and timestamps visible.</li><li>Use a date range if the conversation includes unrelated older messages.</li><li>Save the PDF with the order number, invoice, receipt or delivery record in your normal business folder.</li></ol>`],
+      ['What to keep together', `<p>For a stronger paper trail, store the chat PDF beside the formal business documents that relate to the transaction: the quote, invoice, receipt, payment record, shipping record, purchase order or delivery confirmation. The chat is useful context because it shows what was discussed and confirmed in sequence.</p>`]
+    ],
+    faq: [['Does a WhatsApp PDF replace an invoice?', 'No. It is supporting documentation. Continue using the invoices, receipts and accounting records required for your business.'], ['Should I keep the original export too?', 'Yes. Keep the untouched export separately from the formatted PDF so you retain both the source files and a readable copy.']]
+  },
+  'whatsapp-quotes-customer-approvals-pdf': {
+    description: 'Save WhatsApp quote approvals, scope changes and customer confirmations as a readable PDF to keep with estimates, invoices and job records.',
+    sections: [
+      ['Why approvals get lost in chat', `<p>A customer may approve a quote, accept a revised price, choose an option or authorize extra work with a short WhatsApp reply. Months later, that decision can be difficult to locate in a long conversation.</p><p>Exporting the relevant thread to PDF makes the approval easier to retrieve and review alongside the formal quote or job file.</p>`],
+      ['What to preserve', `<p>Keep sender names, timestamps and the surrounding messages that explain what was being approved. Avoid saving only a single isolated reply if the meaning depends on the price, scope or option discussed immediately before it.</p><p>Use ChatToPaper's date filtering when you need only the part of the conversation connected to a specific quote or project.</p>`],
+      ['Keep formal records separate', `<p>The PDF should support your normal business records, not replace them. Keep the signed proposal, quote, estimate, invoice and payment records in the systems you already use. A formatted WhatsApp conversation is useful context, but it does not automatically establish contractual or legal status.</p>`]
+    ],
+    faq: [['Can I use this for change-order approvals?', 'Yes, as a readable record of the conversation. Keep the formal change order or revised estimate as well.'], ['Should I include timestamps?', 'Usually yes. Timestamps help show the sequence of the discussion and approval.']]
+  },
+  'whatsapp-supplier-orders-purchase-records': {
+    description: 'Archive WhatsApp supplier order discussions, quantities, substitutions and delivery confirmations as PDF alongside purchase and inventory records.',
+    sections: [
+      ['Supplier conversations are operational records', `<p>Small businesses often coordinate purchases with suppliers through WhatsApp: quantities, unit prices, availability, substitutions, delivery windows and missing items. That chat may be the fastest place to check what was agreed, but it is not always easy to search later.</p>`],
+      ['Create a readable purchase trail', `<ol class="steps"><li>Export the supplier chat after the order or delivery is complete.</li><li>Convert it to PDF with timestamps and participant names visible.</li><li>Keep photos when they show products, damage, packing or delivery details.</li><li>Store the PDF with the purchase order, supplier invoice, receipt and inventory record.</li></ol>`],
+      ['Use the PDF as supporting context', `<p>The chat can explain why a substitute was accepted, when a delivery was promised or which quantity was confirmed. It should complement, not replace, your accounting and purchasing documents.</p>`]
+    ],
+    faq: [['Can I keep supplier photos in the PDF?', 'Yes, when the export includes supported image files and their filenames can be matched to the chat.'], ['Is this a purchase-order system?', 'No. ChatToPaper formats the exported conversation; use your normal purchasing system for formal orders and accounting.']]
+  },
+  'whatsapp-contractor-job-records': {
+    description: 'Preserve WhatsApp job instructions, customer photos, schedule changes and approved extras as a PDF for contractor and service-job files.',
+    sections: [
+      ['What often lives in the job chat', `<p>Contractors and field-service businesses commonly receive measurements, site photos, access instructions, scheduling changes, material choices and approvals for extra work in WhatsApp. Keeping those decisions with the job file reduces the chance that important context is buried in an old thread.</p>`],
+      ['Build a job paper trail', `<p>Export the customer or project chat and create a PDF covering the relevant job dates. Keep names, timestamps and photos when they matter. File the PDF with estimates, work orders, invoices, signed agreements and site documentation.</p>`],
+      ['Preserve context around changes', `<p>If a customer approves an added task or revised price, include the messages immediately before and after the approval so the record is understandable on its own. A chat PDF can document the conversation but does not replace a formal change order where one is required.</p>`]
+    ],
+    faq: [['Can I use this for before-and-after job photos?', 'Yes, when those images are part of the exported conversation and supported by the converter.'], ['Does this prove a customer approved extra work?', 'It records the exported conversation in readable form, but legal or contractual effect depends on the facts and applicable rules. Keep your formal job documents too.']]
+  },
+  'whatsapp-property-management-records': {
+    description: 'Save WhatsApp tenant repair requests, vendor updates, access instructions and property photos as a readable PDF for property files.',
+    sections: [
+      ['Common property-management chat records', `<p>Tenant and vendor conversations may contain repair requests, photos of damage, access arrangements, appointment windows, contractor updates and completion confirmations. Those messages can be useful context when reviewing maintenance history later.</p>`],
+      ['File conversations by property or issue', `<p>Export the relevant conversation, use a date range for the repair or incident, and create a PDF with names and timestamps visible. Store it with the work order, invoice, inspection record or property-management system entry for that issue.</p>`],
+      ['Handle personal information carefully', `<p>Property conversations can contain phone numbers, addresses, access information and other private details. Limit who receives the PDF and retain it according to your normal privacy and record-retention practices.</p>`]
+    ],
+    faq: [['Can I save vendor conversations too?', 'Yes. Vendor instructions and completion updates can be archived the same way and stored with the related maintenance record.'], ['Should I email these PDFs to everyone involved?', 'Not automatically. Treat them as business records containing personal information and share only when appropriate.']]
+  },
+  'whatsapp-freelancer-client-records': {
+    description: 'Archive WhatsApp client requirements, revisions, delivery confirmations and approvals as a PDF alongside proposals, invoices and project files.',
+    sections: [
+      ['Chats often contain project decisions', `<p>Freelancers, consultants and service businesses frequently receive scope details, revision requests, deadlines, file approvals and delivery confirmations through WhatsApp. A readable PDF helps keep those decisions with the rest of the project instead of relying on chat search months later.</p>`],
+      ['Close out a project cleanly', `<ol class="steps"><li>Export the client chat when a milestone or project is complete.</li><li>Convert the relevant date range to PDF.</li><li>Keep names, timestamps and images where they explain a revision or approval.</li><li>Save the PDF beside the proposal, statement of work, invoice and final deliverables.</li></ol>`],
+      ['Use it as supporting documentation', `<p>The chat PDF can make it easier to answer questions such as which version was approved or when a deadline changed. It should sit beside your formal scope and billing documents rather than replacing them.</p>`]
+    ],
+    faq: [['Can this help with revision approvals?', 'Yes. Include enough surrounding messages to make the approval clear and keep it with the project record.'], ['Is a chat PDF the same as a signed statement of work?', 'No. It is a readable record of the exported conversation, not a substitute for formal agreements.']]
   }
 };
