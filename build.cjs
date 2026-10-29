@@ -138,8 +138,47 @@ const catNav=cats.map(c=>`<a href="/blog/category/${slugifyCategory(c)}/">${esca
 const featured=articles.filter(a=>a.sections);
 const startHere=`<section class="start-here" aria-labelledby="start-here-title"><div class="eyebrow">FREE TOOL</div><h2>Check your WhatsApp export</h2><p>Before converting, quickly check message count, date range, missing photos and “Media omitted” warnings. Everything is analyzed locally in your browser.</p><p><a class="btn" href="/tools/whatsapp-export-checker/">Open the WhatsApp Export Checker →</a></p><h2 id="start-here-title">Start with a guide</h2><div class="related">${featured.map(a=>`<a href="/blog/${a.slug}/">${escapeHtml(a.title)}</a>`).join('')}</div></section>`;
 const cards=articles.map(a=>`<article class="card"><small>${escapeHtml(a.category)}</small><h2>${escapeHtml(a.title)}</h2><p>${escapeHtml(a.answer)}</p><a href="/blog/${a.slug}/">Read guide →</a></article>`).join('');
+const guideWalkthrough=`<section class="guide-walkthrough" aria-labelledby="how-it-works-title">
+  <div class="walkthrough-copy">
+    <div class="eyebrow">HOW CHATTOPAPER WORKS</div>
+    <h1 id="how-it-works-title">From WhatsApp export to PDF in three steps.</h1>
+    <p>Export your chat from WhatsApp, make any quick adjustments, then save a clean PDF. Your selected chat files stay in your browser.</p>
+  </div>
+  <div class="walkthrough-steps" aria-label="Three steps to create a WhatsApp PDF">
+    <article class="walkthrough-step step-upload">
+      <span class="walkthrough-number">1</span>
+      <div class="walkthrough-demo upload-demo" aria-hidden="true">
+        <div class="demo-file">ZIP</div>
+        <div class="demo-drop"><span>↑</span><small>WhatsApp export</small></div>
+      </div>
+      <h2>Upload your ZIP</h2>
+      <p>Choose the ZIP exported from WhatsApp, or the TXT plus photos.</p>
+    </article>
+    <article class="walkthrough-step step-adjust">
+      <span class="walkthrough-number">2</span>
+      <div class="walkthrough-demo adjust-demo" aria-hidden="true">
+        <div class="demo-slider"><i></i></div>
+        <div class="demo-slider short"><i></i></div>
+        <div class="demo-toggle"><i></i><span>Photos</span></div>
+      </div>
+      <h2>Adjust what you need</h2>
+      <p>Choose dates, page size and layout, then review the preview.</p>
+    </article>
+    <article class="walkthrough-step step-save">
+      <span class="walkthrough-number">3</span>
+      <div class="walkthrough-demo save-demo" aria-hidden="true">
+        <div class="demo-pdf"><b>PDF</b><span></span><span></span><span></span></div>
+        <div class="demo-download">↓</div>
+      </div>
+      <h2>Save your PDF</h2>
+      <p>Download the finished conversation as a clean, printable PDF.</p>
+    </article>
+  </div>
+  <p class="walkthrough-action"><a class="btn" href="/#converter">Create your PDF →</a></p>
+</section>`;
+
 const blogJson=`<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage',name:'ChatToPaper WhatsApp PDF Guides',url:`${SITE}/blog/`,description:'37 focused guides about exporting, printing and preserving WhatsApp conversations, including small-business record keeping.'}).replace(/</g,'\\u003c')}</script>`;
-write('blog/index.html',layout({title:'WhatsApp PDF Guides — Export, Print & Preserve Chats | ChatToPaper',description:'37 focused guides for converting WhatsApp chats to PDF, small-business record keeping, printing conversations with photos, exporting on iPhone and Android, troubleshooting, privacy and archiving.',canonical:`${SITE}/blog/`,jsonLd:blogJson,main:`<main class="wrap"><section class="hero"><div class="eyebrow">37 FOCUSED GUIDES</div><h1>WhatsApp chats,<br>made easier to keep.</h1><p>Answer-first guides for exporting, converting, printing and preserving WhatsApp conversations. Choose a task below, or browse by topic to solve a specific export or printing problem.</p><div class="category-nav">${catNav}</div></section>${startHere}<section class="grid">${cards}</section></main>`}));
+write('blog/index.html',layout({title:'WhatsApp PDF Guides — Export, Print & Preserve Chats | ChatToPaper',description:'37 focused guides for converting WhatsApp chats to PDF, small-business record keeping, printing conversations with photos, exporting on iPhone and Android, troubleshooting, privacy and archiving.',canonical:`${SITE}/blog/`,jsonLd:blogJson,main:`<main class="wrap">${guideWalkthrough}<section class="hero guide-library-hero"><div class="eyebrow">37 FOCUSED GUIDES</div><h1>WhatsApp chats,<br>made easier to keep.</h1><p>Answer-first guides for exporting, converting, printing and preserving WhatsApp conversations. Choose a task below, or browse by topic to solve a specific export or printing problem.</p><div class="category-nav">${catNav}</div></section>${startHere}<section class="grid">${cards}</section></main>`}));
 for(const cat of cats){
   const subset=articles.filter(a=>a.category===cat);
   const catCards=subset.map(a=>`<article class="card"><small>${escapeHtml(a.category)}</small><h2>${escapeHtml(a.title)}</h2><p>${escapeHtml(a.answer)}</p><a href="/blog/${a.slug}/">Read guide →</a></article>`).join('');
