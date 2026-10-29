@@ -238,15 +238,15 @@ const checkerScript = String.raw`
   input.addEventListener('change',inspect);
 })();`.replace(/<\/script/gi,'<\\/script');
 
-const checkerJson = `<script type="application/ld+json">\${JSON.stringify({
+const checkerJson = `<script type="application/ld+json">${JSON.stringify({
   '@context':'https://schema.org','@type':'WebApplication',
   name:'WhatsApp Export Checker by ChatToPaper',
-  url:`\${SITE}/tools/whatsapp-export-checker/`,
+  url:`${SITE}/tools/whatsapp-export-checker/`,
   applicationCategory:'UtilitiesApplication',
   operatingSystem:'Any modern web browser',
   description:'Free private WhatsApp export checker that analyzes an exported TXT or ZIP locally and reports messages, dates, media matches, missing photos, omitted media and warnings.',
   offers:{'@type':'Offer',price:'0',priceCurrency:'USD'},
-  provider:{'@type':'Organization','@id':`\${SITE}/#org`,name:'ChatToPaper'}
+  provider:{'@type':'Organization','@id':`${SITE}/#org`,name:'ChatToPaper'}
 }).replace(/</g,'\\\\u003c')}</script>`;
 const checkerMain = `<main class="article checker-page">
   <div class="eyebrow">FREE · PRIVATE · NO ACCOUNT</div>
@@ -287,9 +287,9 @@ write('tools/whatsapp-export-checker/index.html',
   layout({
     title:'Free WhatsApp Export Checker — Messages, Photos & Media | ChatToPaper',
     description:'Free private WhatsApp export checker. Analyze a TXT or ZIP locally to see message count, date range, missing photos, Media omitted items and export warnings.',
-    canonical:`\${SITE}/tools/whatsapp-export-checker/`,
+    canonical:`${SITE}/tools/whatsapp-export-checker/`,
     jsonLd:checkerJson,
-    main:checkerMain+checkerCss+`<script>\${checkerZip}</script><script>\${checkerImporter}</script><script>\${checkerScript}</script>`
+    main:checkerMain+checkerCss+`<script>${checkerZip}</script><script>${checkerImporter}</script><script>${checkerScript}</script>`
   })
 );
 
