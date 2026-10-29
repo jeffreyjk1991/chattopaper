@@ -29,7 +29,7 @@ test('GET proxies count through private Neon Function',async()=>{
   assert.equal(calls[0][1].headers['x-counter-secret'],'test-secret');
 });
 
-test('POST validates origin and forwards event id to Neon Function',async()=>{
+test('POST validates origin and forwards conversion attribution to Neon Function',async()=>{
   const calls=[];
   global.fetch=async(url,opts)=>{calls.push([url,opts]);return {ok:true,status:200,json:async()=>({count:3})};};
   const handler=loadHandler();
@@ -40,12 +40,17 @@ test('POST validates origin and forwards event id to Neon Function',async()=>{
   assert.equal(calls.length,0);
 
   const good=makeRes();
-  await handler({method:'POST',headers:{origin:'https://chattopaper.com'},body:{eventId:'9f9f2b7c-6b31-4d88-9a9d-4be94ca66f10'}},good);
+  await handler({method:'POST',headers:{origin:'https://chattopaper.com','user-agent':'Mozilla/5.0 (iPhone; Mobile)','x-vercel-ip-country':'US','x-vercel-ip-country-region':'MI'},body:{eventId:'9f9f2b7c-6b31-4d88-9a9d-4be94ca66f10',referrerHost:'google.com',utmSource:'google',utmMedium:'organic',utmCampaign:'whatsapp-pdf',landingPage:'/blog/convert-whatsapp-chat-to-pdf/'}},good);
   assert.equal(good.statusCode,200);
   assert.deepEqual(JSON.parse(good.body),{count:3});
   assert.equal(calls.length,1);
   assert.equal(calls[0][1].headers['x-counter-secret'],'test-secret');
-  assert.deepEqual(JSON.parse(calls[0][1].body),{eventId:'9f9f2b7c-6b31-4d88-9a9d-4be94ca66f10'});
+  assert.deepEqual(JSON.parse(calls[0][1].body),{
+    eventId:'9f9f2b7c-6b31-4d88-9a9d-4be94ca66f10',
+    country:'US',region:'MI',referrerHost:'google.com',
+    utmSource:'google',utmMedium:'organic',utmCampaign:'whatsapp-pdf',
+    landingPage:'/blog/convert-whatsapp-chat-to-pdf/',deviceType:'mobile'
+  });
 });
 
 test('invalid UUID is rejected before backend call',async()=>{
