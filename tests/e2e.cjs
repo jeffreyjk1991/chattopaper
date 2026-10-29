@@ -73,6 +73,7 @@ async function main(){
     await page.waitForFunction(()=>Number(document.querySelector('#page-count')?.textContent)>0,null,{timeout:15000});
     assert.ok(await page.locator('#preview-canvas').evaluate(el=>el.width>0 && el.height>0));
     assert.match(await page.locator('#download-open').innerText(),/Download PDF — Free/);
+    assert.equal(await page.locator('#inline-download-wrap').isHidden(),true);
     const pagesBefore=context.pages().length;
     const downloadPromise=page.waitForEvent('download',{timeout:30000});
     await page.locator('#download-open').click();
