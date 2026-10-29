@@ -18,7 +18,7 @@
 /* Simple three-step product walkthrough on Guides */
 .guide-walkthrough{padding:68px 0 54px;border-bottom:1px solid var(--line)}
 .walkthrough-copy{max-width:760px}
-.walkthrough-copy h1{font-size:clamp(2.55rem,5.4vw,5rem);line-height:.98;letter-spacing:-.04em;margin:.18em 0 .3em}
+.walkthrough-copy h2{font-size:clamp(2.55rem,5.4vw,5rem);line-height:.98;letter-spacing:-.04em;margin:.18em 0 .3em}
 .walkthrough-copy p{font-size:1.18rem;color:var(--muted);max-width:700px}
 .walkthrough-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px}
 .walkthrough-step{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;overflow:hidden}
