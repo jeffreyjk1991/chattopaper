@@ -179,6 +179,7 @@
   }
   async function importFiles(files) {
     if(!files.length)return;
+    track('file_selected',{files:files.length,zip:files.some(file=>/\.zip$/i.test(file.name))});
     const token=++state.importRevision;state.importing=true;updatePickerState();updateDownloadEnabled();setError('');
     $('import-status').textContent='Reading your export on this device…';
     try {
