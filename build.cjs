@@ -46,7 +46,7 @@ write('ChatToPaper.html', html);
 fs.mkdirSync(out('assets'),{recursive:true});
 for (const asset of ['coast.svg','logo-icon-original-20261023.png','logo-wordmark-original-20261023.png']) fs.copyFileSync(path.join(root,'assets',asset),out('assets',asset));
 
-const nav = `<div class="topbar"><div class="wrap nav"><a class="brand brand-image" href="/" aria-label="ChatToPaper home"><img src="/assets/logo-wordmark-original-20261023.png" alt="ChatToPaper" width="2172" height="724"></a><div class="navlinks"><a href="/blog/">Guides</a><a href="/about/">About</a><a href="/editorial-policy/">Editorial policy</a><a class="btn" href="/#converter">Create your PDF</a></div></div></div>`;
+const nav = `<div class="topbar"><div class="wrap nav"><a class="brand brand-image" href="/" aria-label="ChatToPaper home"><img src="/assets/logo-wordmark-original-20261023.png" alt="ChatToPaper" width="2172" height="724"></a><div class="navlinks"><a href="/tools/whatsapp-export-checker/">Export checker</a><a href="/blog/">Guides</a><a href="/about/">About</a><a href="/editorial-policy/">Editorial policy</a><a class="btn" href="/#converter">Create your PDF</a></div></div></div>`;
 const footer = `<footer class="footer"><div class="wrap"><span><a class="footer-brand" href="/" aria-label="ChatToPaper home"><img src="/assets/logo-wordmark-original-20261023.png" alt="ChatToPaper" width="2172" height="724"></a><br>WhatsApp chats, beautifully on paper.</span><span><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/editorial-policy/">Editorial policy</a> · Independent tool, not affiliated with WhatsApp or Meta.</span></div></footer>`;
 function baseHead({title,description,canonical,type='website',jsonLd='',robots='index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'}){
   return `<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f6f5ef"><meta name="referrer" content="strict-origin-when-cross-origin"><meta name="robots" content="${robots}"><meta name="description" content="${escapeHtml(description)}"><link rel="canonical" href="${canonical}"><link rel="alternate" type="application/rss+xml" title="ChatToPaper Blog" href="${SITE}/feed.xml"><meta property="og:type" content="${type}"><meta property="og:site_name" content="ChatToPaper"><meta property="og:title" content="${escapeHtml(title)}"><meta property="og:description" content="${escapeHtml(description)}"><meta property="og:url" content="${canonical}"><meta name="twitter:card" content="summary"><meta property="og:image" content="${SITE}/assets/logo-wordmark-original-20261023.png"><meta property="og:image:alt" content="ChatToPaper logo"><link rel="icon" href="${favicon}" type="image/png"><link rel="apple-touch-icon" href="${favicon}"><title>${escapeHtml(title)}</title><style>${blogCss}</style>${jsonLd}`;
@@ -175,9 +175,127 @@ const paymentSuccessScript = `<script>(function(){
 })();</script>`;
 write('payment-success/index.html',`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#f6f5ef"><title>Payment complete | ChatToPaper</title><style>${blogCss}.payment-result{max-width:660px;margin:14vh auto;padding:0 24px;text-align:center}.payment-result h1{font-size:clamp(2.4rem,7vw,4.6rem);margin:.2em 0}.payment-result p{font-size:1.08rem;line-height:1.7}.payment-result .success-only,.payment-result .error-only{display:none}html[data-payment=success] .success-only{display:block}html[data-payment=invalid] .error-only{display:block}</style></head><body>${nav}<main class="payment-result"><div class="success-only"><div class="eyebrow">PAYMENT COMPLETE</div><h1>Your PDF is being prepared.</h1><p>ChatToPaper has notified the original tab where your conversation is still loaded. This payment tab should close automatically. If it stays open, close it and return to the original ChatToPaper tab — your PDF will be ready there.</p><button class="btn" onclick="window.close()">Return to my PDF</button></div><div class="error-only"><div class="eyebrow">RETURN LINK ISSUE</div><h1>We could not read the payment return.</h1><p>Return to the original ChatToPaper tab. Your conversation is still there. If the PDF does not unlock, reopen Checkout from that tab.</p><a class="btn" href="/">Back to ChatToPaper</a></div></main>${footer}${analytics}${paymentSuccessScript}</body></html>`);
 
+
+// Link-worthy diagnostic tool: all analysis stays in the browser.
+const checkerImporter = read('src/importer.js').replace(/<\/script/gi, '<\\/script');
+const checkerZip = zipLib.replace(/<\/script/gi, '<\\/script');
+const checkerScript = String.raw\`
+(function(){
+  const input=document.getElementById('checker-files');
+  const status=document.getElementById('checker-status');
+  const results=document.getElementById('checker-results');
+  const grid=document.getElementById('checker-grid');
+  const warnings=document.getElementById('checker-warnings');
+  const cta=document.getElementById('checker-cta');
+  const fmt=n=>Number(n||0).toLocaleString('en-US');
+  const track=(name,data={})=>{try{if(typeof window.va==='function')window.va('event',{name,data});}catch(_){}};
+  function card(label,value,note=''){return '<div class="checker-card"><small>'+label+'</small><strong>'+value+'</strong>'+(note?'<span>'+note+'</span>':'')+'</div>';}
+  function esc(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  async function inspect(){
+    const files=Array.from(input.files||[]);
+    if(!files.length)return;
+    results.hidden=true;cta.hidden=true;warnings.innerHTML='';
+    status.textContent='Checking the export locally in your browser…';
+    track('export_checker_started',{files:files.length,zip:files.some(f=>/\\.zip$/i.test(f.name))});
+    try{
+      let archive={entries:0,images:0,textFiles:0,other:0};
+      const zip=files.length===1&&/\\.zip$/i.test(files[0].name)?files[0]:null;
+      if(zip){
+        const bytes=new Uint8Array(await ChatImport.readFileBuffer(zip));
+        const entries=ChatImport.inspectZip(bytes);
+        archive.entries=entries.length;
+        for(const entry of entries){
+          if(/\\.(jpe?g|png|webp|gif|avif)$/i.test(entry.name))archive.images++;
+          else if(/\\.txt$/i.test(entry.name))archive.textFiles++;
+          else archive.other++;
+        }
+      }
+      const source=await ChatImport.readFiles(files);
+      const parsed=ChatImport.parse(source.text,{dateOrder:'auto'});
+      const linked=ChatImport.linkMedia(parsed.messages,source.media);
+      const stats=parsed.stats||{};
+      grid.innerHTML=[
+        card('Messages',fmt(stats.messages),fmt(stats.userMessages)+' user messages'),
+        card('Participants',fmt(parsed.participants.length),parsed.participants.slice(0,3).map(esc).join(', ')),
+        card('Date range',stats.firstDate&&stats.lastDate?esc(stats.firstDate)+' → '+esc(stats.lastDate):'Not detected'),
+        card('Photos referenced',fmt(stats.photosReferenced),fmt(linked.matchedPhotos)+' matched'),
+        card('Missing photos',fmt(linked.missingPhotos),linked.missingPhotos?'Needs review':'No missing photo references detected'),
+        card('Media omitted',fmt(linked.omittedMedia),linked.omittedMedia?'WhatsApp did not include these files':'None detected'),
+        card('Unsupported media',fmt(linked.unsupportedMedia),'Audio/video/documents remain references'),
+        card('Ambiguous dates',parsed.ambiguousDates?'Yes':'No',parsed.ambiguousDates?'Confirm D/M/Y vs M/D/Y before PDF':'Date order looks consistent'),
+        ...(zip?[card('ZIP files',fmt(archive.entries),fmt(archive.images)+' images · '+fmt(archive.textFiles)+' text files')]:[])
+      ].join('');
+      const allWarnings=[...(source.warnings||[]),...(parsed.warnings||[]),...(linked.warnings||[])];
+      warnings.innerHTML=allWarnings.length?'<h2>Things to review</h2><ul>'+allWarnings.map(w=>'<li>'+esc(w)+'</li>').join('')+'</ul>':'<h2>No major warnings detected</h2><p>The export parsed cleanly. Still compare the date range and media count with what you expected from WhatsApp.</p>';
+      status.textContent='Check complete. Nothing from your chat was uploaded to ChatToPaper.';
+      results.hidden=false;cta.hidden=false;
+      track('export_checker_completed',{messages:Number(stats.messages||0),missingPhotos:linked.missingPhotos,omittedMedia:linked.omittedMedia,ambiguousDates:Boolean(parsed.ambiguousDates)});
+    }catch(error){
+      status.textContent=error&&error.message?error.message:'This export could not be checked. Try the original WhatsApp TXT or ZIP.';
+      track('export_checker_failed',{code:error&&error.code?String(error.code):'unknown'});
+    }
+  }
+  input.addEventListener('change',inspect);
+})();\`.replace(/<\/script/gi,'<\\/script');
+
+const checkerJson = \`<script type="application/ld+json">\${JSON.stringify({
+  '@context':'https://schema.org','@type':'WebApplication',
+  name:'WhatsApp Export Checker by ChatToPaper',
+  url:\`\${SITE}/tools/whatsapp-export-checker/\`,
+  applicationCategory:'UtilitiesApplication',
+  operatingSystem:'Any modern web browser',
+  description:'Free private WhatsApp export checker that analyzes an exported TXT or ZIP locally and reports messages, dates, media matches, missing photos, omitted media and warnings.',
+  offers:{'@type':'Offer',price:'0',priceCurrency:'USD'},
+  provider:{'@type':'Organization','@id':\`\${SITE}/#org\`,name:'ChatToPaper'}
+}).replace(/</g,'\\\\u003c')}</script>\`;
+const checkerMain = \`<main class="article checker-page">
+  <div class="eyebrow">FREE · PRIVATE · NO ACCOUNT</div>
+  <h1>WhatsApp Export Checker</h1>
+  <p class="lede">Check a WhatsApp TXT or ZIP before turning it into a PDF. See message count, date range, participants, matched photos, missing photos, “Media omitted” items and date warnings. The files are analyzed locally in your browser.</p>
+  <section class="checker-box" aria-labelledby="checker-title">
+    <h2 id="checker-title">Check your export</h2>
+    <p>Select one WhatsApp ZIP, or a chat TXT with its exported photos. Nothing in the conversation is sent to a ChatToPaper application server.</p>
+    <label class="btn checker-button">Choose WhatsApp export<input id="checker-files" type="file" accept=".zip,.txt,image/jpeg,image/png,image/webp,image/gif,image/avif" multiple hidden></label>
+    <p id="checker-status" role="status" aria-live="polite">TXT and ZIP supported. For the best media check, use the untouched export.</p>
+  </section>
+  <section id="checker-results" hidden>
+    <h2>Your export at a glance</h2>
+    <div id="checker-grid" class="checker-grid"></div>
+    <div id="checker-warnings" class="answerbox"></div>
+  </section>
+  <section id="checker-cta" class="answerbox" hidden>
+    <strong>Ready to make it printable?</strong>
+    <p>Use the same original export in ChatToPaper to preview the conversation, choose a date range and create a clean PDF.</p>
+    <p><a class="btn" href="/#converter">Convert this WhatsApp chat to PDF →</a></p>
+  </section>
+  <h2>What this checker can tell you</h2>
+  <p>A WhatsApp export can look fine at first glance while still missing attachments or using an ambiguous date format. This checker reads the export using the same parser as ChatToPaper and makes those issues visible before you create a PDF.</p>
+  <div class="table-scroll"><table><thead><tr><th>Check</th><th>Why it matters</th></tr></thead><tbody>
+  <tr><td>Message and participant count</td><td>Helps confirm you selected the intended conversation.</td></tr>
+  <tr><td>First and last date</td><td>Shows whether the exported period matches what you expected.</td></tr>
+  <tr><td>Matched and missing photos</td><td>Identifies attachment references that do or do not have an exported image file.</td></tr>
+  <tr><td>“Media omitted”</td><td>Shows attachments WhatsApp referenced without providing the underlying file.</td></tr>
+  <tr><td>Ambiguous dates</td><td>Flags exports where dates such as 04/05 could be interpreted in more than one regional order.</td></tr>
+  </tbody></table></div>
+  <h2>Common fixes after checking</h2>
+  <p>If media is missing, <a href="/blog/whatsapp-export-media-omitted/">learn what “Media omitted” means</a> or use the <a href="/blog/whatsapp-photos-missing-from-pdf/">missing-photo checklist</a>. If the export looks complete, continue to the <a href="/blog/convert-whatsapp-chat-to-pdf/">full WhatsApp-to-PDF guide</a>.</p>
+</main>\`;
+const checkerCss = \`<style>
+.checker-page{max-width:980px}.checker-box{padding:28px;border:1px solid #dcdad1;border-radius:18px;background:#fff;margin:30px 0}.checker-button{display:inline-block;cursor:pointer}.checker-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:18px 0 26px}.checker-card{border:1px solid #dedcd3;border-radius:14px;padding:18px;background:#fff}.checker-card small,.checker-card span{display:block}.checker-card small{font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.72rem}.checker-card strong{display:block;font-size:1.7rem;margin:7px 0}.checker-card span{color:#5e5c56;font-size:.9rem}.checker-page .answerbox{margin:22px 0}
+</style>\`;
+write('tools/whatsapp-export-checker/index.html',
+  layout({
+    title:'Free WhatsApp Export Checker — Messages, Photos & Media | ChatToPaper',
+    description:'Free private WhatsApp export checker. Analyze a TXT or ZIP locally to see message count, date range, missing photos, Media omitted items and export warnings.',
+    canonical:\`\${SITE}/tools/whatsapp-export-checker/\`,
+    jsonLd:checkerJson,
+    main:checkerMain+checkerCss+\`<script>\${checkerZip}</script><script>\${checkerImporter}</script><script>\${checkerScript}</script>\`
+  })
+);
+
 // Crawl/discovery files.
 const sitemapUrls=[
-  {loc:`${SITE}/`,priority:'1.0'}, {loc:`${SITE}/blog/`,priority:'0.9'},
+  {loc:`${SITE}/`,priority:'1.0'}, {loc:`${SITE}/tools/whatsapp-export-checker/`,priority:'0.9'}, {loc:`${SITE}/blog/`,priority:'0.9'},
   ...cats.map(c=>({loc:`${SITE}/blog/category/${slugifyCategory(c)}/`,priority:'0.7'})),
   ...articles.map(a=>({loc:`${SITE}/blog/${a.slug}/`,lastmod:a.updated,priority:'0.8'})),
   ...['about','editorial-policy','privacy','terms'].map(s=>({loc:`${SITE}/${s}/`,priority:'0.5'}))
