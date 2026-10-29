@@ -13,7 +13,7 @@ const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;
 const escXml = escapeHtml;
 const articles = require('./content/articles.cjs');
 const blogCss = read('src/blog.css');
-const analytics = `<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments)};</script><script defer src="/_vercel/insights/script.js"></script><script defer src="/_vercel/speed-insights/script.js"></script>`;
+const analytics = `<script>(function(){try{var k='chattopaper.attribution.v1';if(!sessionStorage.getItem(k)){var p=new URLSearchParams(location.search),r='';try{r=document.referrer?new URL(document.referrer).hostname.replace(/^www\\./,''):''}catch(e){}sessionStorage.setItem(k,JSON.stringify({referrerHost:r,utmSource:p.get('utm_source')||'',utmMedium:p.get('utm_medium')||'',utmCampaign:p.get('utm_campaign')||'',utmContent:p.get('utm_content')||'',utmTerm:p.get('utm_term')||'',landingPage:location.pathname}));}}catch(e){}})();window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments)};</script><script defer src="/_vercel/insights/script.js"></script><script defer src="/_vercel/speed-insights/script.js"></script>`;
 const favicon = `${SITE}/assets/logo-icon-original-20261023.png`;
 
 const out = (...p) => path.join(root, 'dist', ...p);
