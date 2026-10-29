@@ -93,7 +93,8 @@ test('free launch UI bypasses checkout and points to custom domain',()=>{
   assert.match(home,/Free for a limited time/);
   assert.match(home,/Download PDF — Free/);
   assert.match(app,/if\(freeLaunchMode\) state\.paymentUnlocked=true/);
-  assert.match(app,/if\(freeLaunchMode\) state\.paymentUnlocked=true;\s*if\(!state\.paymentUnlocked\)\{beginStripePayment\(\);return;\}/);
+  assert.match(app,/if\(freeLaunchMode\)\{\s*state\.paymentUnlocked=true;\s*void downloadPDF\(\);\s*return;\s*\}/);
+  assert.match(app,/setTimeout\(\(\)=>location\.assign\('\/'\),500\)/);
   assert.match(build,/process\.env\.FREE_LAUNCH/);
 });
 
