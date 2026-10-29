@@ -49,12 +49,12 @@ const clusters = [
     items: [
       ['How to Print a WhatsApp Chat With Photos', 'print-whatsapp-chat-with-photos', 'Export with media, then use a converter that places each matched image near the message that referenced its filename. This is much more readable than printing the transcript and photos separately.', 'print whatsapp chat with photos'],
       ['How to Convert WhatsApp ZIP to PDF With Photos', 'whatsapp-zip-to-pdf-with-photos', 'A ZIP-to-PDF workflow should inspect the chat text, locate photo references, match them to image files inside the ZIP, and show missing-photo warnings before creating the document.', 'whatsapp zip pdf photos'],
-      ['Why WhatsApp Photos Are Missing From a PDF Export', 'whatsapp-photos-missing-from-pdf', 'A PDF converter can only include images that exist in the export and match a referenced filename. Re-export with media if the ZIP or selected files do not contain the photo.', 'whatsapp pdf missing photos'],
-      ['WhatsApp Export Says Media Omitted: What It Means', 'whatsapp-export-media-omitted', '“Media omitted” means the exported transcript records that media existed, but the file itself was not included. A trustworthy converter should preserve a placeholder rather than inventing or silently dropping it.', 'whatsapp media omitted'],
+      ['WhatsApp Photos Missing From Export or PDF? 7 Things to Check', 'whatsapp-photos-missing-from-pdf', 'If WhatsApp photos are missing, first check whether you exported with media, whether the image files are actually inside the ZIP, and whether their filenames still match the transcript. This guide walks through the most common causes and fixes.', 'whatsapp photos missing export pdf'],
+      ['WhatsApp Export Says “Media Omitted”? What It Means and How to Fix It', 'whatsapp-export-media-omitted', 'Seeing “Media omitted” in a WhatsApp export means the transcript knows an attachment existed but the actual file is not available in the export. Here is how to tell whether re-exporting with media can fix it and what cannot be recovered.', 'whatsapp export media omitted fix'],
       ['How WhatsApp Photo Filenames Match Messages', 'whatsapp-photo-filenames-match-messages', 'WhatsApp exports often reference an attachment filename in the transcript. Matching that normalized filename to an exported image lets a converter restore the photo to the right point in the conversation.', 'whatsapp photo filename'],
       ['Can WhatsApp Voice Notes Be Put in a PDF?', 'whatsapp-voice-notes-pdf', 'A PDF can list that a voice note existed, but the audio itself is not naturally represented on paper. A simple chat-to-PDF tool should use a labeled placeholder unless it explicitly supports transcription or QR links.', 'whatsapp voice notes pdf'],
       ['Can WhatsApp Videos Be Included in a Printable PDF?', 'whatsapp-videos-printable-pdf', 'Video cannot play inside a normal printed page. A practical PDF can preserve the video filename or placeholder, while photos and text remain directly printable.', 'whatsapp video pdf'],
-      ['How to Handle WhatsApp Stickers in a PDF', 'whatsapp-stickers-pdf', 'Sticker support depends on the exported file format and whether the converter supports that image type. If not, the safest behavior is to keep a labeled placeholder at the correct message position.', 'whatsapp stickers pdf'],
+      ['How to Save WhatsApp Stickers in a PDF Export', 'whatsapp-stickers-pdf', 'WhatsApp stickers are usually WebP image files. If the sticker file is included in the chat export and supported by the converter, it can be preserved in context; otherwise the PDF should show a clear placeholder instead of silently dropping it.', 'whatsapp stickers pdf export'],
       ['How to Keep WhatsApp Photos in the Correct Order', 'whatsapp-photos-correct-order', 'Do not sort photos by the file system date alone. Use the message sequence in the exported transcript and place each matched image where its attachment reference appears.', 'whatsapp photos order'],
       ['How to Check Whether a WhatsApp Export Includes Media', 'check-whatsapp-export-includes-media', 'Before conversion, inspect the ZIP or selected files for image files and compare them with attachment references in the transcript. After import, use the converter’s matched-photo count as a second check.', 'check whatsapp export media']
     ]
@@ -199,6 +199,7 @@ const KEEP = new Set([
   'does-whatsapp-export-include-deleted-messages',
   'can-you-print-whatsapp-group-chats',
   'easiest-way-print-whatsapp-messages',
+  'whatsapp-stickers-pdf',
   'whatsapp-customer-orders-business-records',
   'whatsapp-quotes-customer-approvals-pdf',
   'whatsapp-supplier-orders-purchase-records',
@@ -216,7 +217,7 @@ const articles = clusters
   })))
   .filter(article => KEEP.has(article.slug));
 
-if (articles.length !== 36) throw new Error(`Expected 36 focused articles, got ${articles.length}`);
+if (articles.length !== 37) throw new Error(`Expected 37 focused articles, got ${articles.length}`);
 
 const detailed = require('./detailed-guides.cjs');
 for (const article of articles) {
