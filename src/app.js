@@ -21,6 +21,21 @@
   const icon = name => { const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','icon'); const use=document.createElementNS('http://www.w3.org/2000/svg','use'); use.setAttribute('href','#i-'+name);svg.append(use);return svg; };
   const txt = (tag, value, className) => {const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
   function track(name, data={}) { try { if(typeof window.va==='function') window.va('event', {name, data}); } catch(_){} }
+  function conversionAttribution() {
+    let stored={};
+    try{stored=JSON.parse(sessionStorage.getItem('chattopaper.attribution.v1')||'{}')||{};}catch(_){}
+    const params=new URLSearchParams(location.search);
+    const hostFrom=(value)=>{try{return value?new URL(value,location.href).hostname.replace(/^www\./,''):'';}catch(_){return '';}};
+    return {
+      referrerHost:String(stored.referrerHost||hostFrom(document.referrer)||'').slice(0,255),
+      utmSource:String(stored.utmSource||params.get('utm_source')||'').slice(0,120),
+      utmMedium:String(stored.utmMedium||params.get('utm_medium')||'').slice(0,120),
+      utmCampaign:String(stored.utmCampaign||params.get('utm_campaign')||'').slice(0,180),
+      utmContent:String(stored.utmContent||params.get('utm_content')||'').slice(0,180),
+      utmTerm:String(stored.utmTerm||params.get('utm_term')||'').slice(0,180),
+      landingPage:String(stored.landingPage||location.pathname).slice(0,300)
+    };
+  }
   async function recordPdfUsage() {
     try {
       const eventId=(typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function')?crypto.randomUUID():null;
@@ -28,7 +43,7 @@
       await fetch('/api/pdf-count',{
         method:'POST',
         headers:{'content-type':'application/json'},
-        body:JSON.stringify({eventId}),
+        body:JSON.stringify({eventId,...conversionAttribution()}),
         keepalive:true,
         cache:'no-store'
       });
