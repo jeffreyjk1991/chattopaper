@@ -28,7 +28,17 @@ module.exports=async function handler(req,res){
       if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(eventId)){
         return send(res,400,{error:'invalid_event'});
       }
-      body=JSON.stringify({eventId});
+      const ua=String((req.headers&&req.headers['user-agent'])||'');
+      const deviceType=/ipad|tablet|kindle|silk/i.test(ua)?'tablet':(/mobi|android|iphone|ipod/i.test(ua)?'mobile':'desktop');
+      body=JSON.stringify({
+        eventId,
+        referrerHost:String((input&&input.referrerHost)||'direct').slice(0,255),
+        utmSource:String((input&&input.utmSource)||'').slice(0,120)||null,
+        utmMedium:String((input&&input.utmMedium)||'').slice(0,120)||null,
+        utmCampaign:String((input&&input.utmCampaign)||'').slice(0,180)||null,
+        landingPage:String((input&&input.landingPage)||'/').slice(0,300),
+        deviceType
+      });
     }
 
     const upstream=await fetch(url,{
