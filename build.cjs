@@ -124,7 +124,7 @@ function articleHtml(a){
   const rel=relatedFor(a);
   const sectionId = i => `section-${i+1}`;
   const detailedBody = a.sections ? `<nav class="article-toc" aria-label="On this page"><strong>On this page</strong><ul>${a.sections.map(([title],i)=>`<li><a href="#${sectionId(i)}">${escapeHtml(title)}</a></li>`).join('')}<li><a href="#questions">Questions and answers</a></li></ul></nav>${a.sections.map(([title,body],i)=>`<section aria-labelledby="${sectionId(i)}"><h2 id="${sectionId(i)}">${escapeHtml(title)}</h2>${body}</section>`).join('')}<section aria-labelledby="questions"><h2 id="questions">Questions and answers</h2>${a.faq.map(([question,answer])=>`<h3>${escapeHtml(question)}</h3><p>${escapeHtml(answer)}</p>`).join('')}</section>` : null;
-  const howToJson = a.slug==='convert-whatsapp-chat-to-pdf' ? \`<script type="application/ld+json">\${JSON.stringify({
+  const howToJson = a.slug==='convert-whatsapp-chat-to-pdf' ? `<script type="application/ld+json">${JSON.stringify({
     '@context':'https://schema.org',
     '@type':'HowTo',
     name:'How to convert a WhatsApp chat to PDF',
@@ -140,8 +140,8 @@ function articleHtml(a){
       {'@type':'HowToStep',position:5,name:'Preview and save',text:'Review the printable preview, then create and download the PDF.'}
     ],
     url:canonical,
-    image:\`\${SITE}/favicon.png\`
-  }).replace(/</g,'\\\\u003c')}</script>\` : '';
+    image:`${SITE}/favicon.png`
+  }).replace(/</g,'\\\\u003c')}</script>` : '';
   const jsonLd=`<script type="application/ld+json">${JSON.stringify({
     '@context':'https://schema.org','@type':'BlogPosting',headline:a.title,description:a.description,datePublished:a.published,dateModified:a.updated,
     mainEntityOfPage:canonical,inLanguage:'en-US',keywords:a.keyword,
