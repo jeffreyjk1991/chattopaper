@@ -220,7 +220,14 @@ const articles = clusters
 if (articles.length !== 37) throw new Error(`Expected 37 focused articles, got ${articles.length}`);
 
 const detailed = require('./detailed-guides.cjs');
+const materiallyUpdated = new Set([
+  'convert-whatsapp-chat-to-pdf',
+  'whatsapp-export-media-omitted',
+  'whatsapp-photos-missing-from-pdf',
+  'whatsapp-stickers-pdf'
+]);
 for (const article of articles) {
   if (detailed[article.slug]) Object.assign(article, detailed[article.slug]);
+  if (materiallyUpdated.has(article.slug)) article.updated = '2026-10-28';
 }
 module.exports = articles;
