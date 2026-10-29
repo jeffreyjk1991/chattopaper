@@ -55,9 +55,11 @@ test('about page reads the live PDF usage count through first-party API',()=>{
   assert.match(build,/pdf-generated-count/);
   assert.doesNotMatch(home,/PDFs generated since tracking started/);
   const api=fs.readFileSync('api/pdf-count.js','utf8');
-  assert.match(api,/PDF_COUNTER_FUNCTION_URL/);
-  assert.match(api,/PDF_COUNTER_SECRET/);
-  assert.match(api,/x-counter-secret/);
+  assert.match(api,/DATABASE_URL/);
+  assert.match(api,/pdf_generation_events/);
+  assert.match(api,/referrer_host/);
+  assert.match(api,/device_type/);
+  assert.doesNotMatch(api,/x-forwarded-for|x-real-ip/);
 });
 
 test('approved logo assets are wired across branding',()=>{
