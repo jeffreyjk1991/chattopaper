@@ -72,3 +72,11 @@ test('approved logo assets are wired across branding',()=>{
   assert.match(build,/brand-image/);
   assert.match(build,/manifest\.webmanifest/);
 });
+
+
+test('export checker is crawlable and included in discovery files',()=>{
+  const build=fs.readFileSync('build.cjs','utf8');
+  assert.match(build,/WhatsApp Export Checker/);
+  assert.match(build,/tools\/whatsapp-export-checker/);
+  assert.match(build,/export_checker_completed/);
+});
