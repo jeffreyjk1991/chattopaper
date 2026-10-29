@@ -31,9 +31,11 @@ export default {
       }
       const clean=(value,max=300)=>String(value||'').trim().slice(0,max)||null;
       await pool.query(
-        'INSERT INTO public.pdf_generation_events(event_id,referrer_host,utm_source,utm_medium,utm_campaign,landing_page,device_type) VALUES ($1::uuid,$2,$3,$4,$5,$6,$7) ON CONFLICT (event_id) DO NOTHING',
+        'INSERT INTO public.pdf_generation_events(event_id,country,region,referrer_host,utm_source,utm_medium,utm_campaign,landing_page,device_type) VALUES ($1::uuid,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT (event_id) DO NOTHING',
         [
           eventId,
+          clean(body?.country,8),
+          clean(body?.region,80),
           clean(body?.referrerHost||'direct',255),
           clean(body?.utmSource,120),
           clean(body?.utmMedium,120),
