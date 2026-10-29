@@ -68,9 +68,10 @@ test('approved logo assets are wired across branding',()=>{
     assert.match(build,new RegExp(asset.replace('.','\\.')));
   }
   assert.match(home,/logo-wordmark-original-20261023\.png/);
-  assert.match(home,/logo-icon-original-20261023\.png/);
+  assert.match(home,/favicon\.png/);
   assert.match(build,/brand-image/);
   assert.match(build,/manifest\.webmanifest/);
+  assert.match(build,/favicon\.png/);
 });
 
 
