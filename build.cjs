@@ -116,6 +116,24 @@ function articleHtml(a){
   const rel=relatedFor(a);
   const sectionId = i => `section-${i+1}`;
   const detailedBody = a.sections ? `<nav class="article-toc" aria-label="On this page"><strong>On this page</strong><ul>${a.sections.map(([title],i)=>`<li><a href="#${sectionId(i)}">${escapeHtml(title)}</a></li>`).join('')}<li><a href="#questions">Questions and answers</a></li></ul></nav>${a.sections.map(([title,body],i)=>`<section aria-labelledby="${sectionId(i)}"><h2 id="${sectionId(i)}">${escapeHtml(title)}</h2>${body}</section>`).join('')}<section aria-labelledby="questions"><h2 id="questions">Questions and answers</h2>${a.faq.map(([question,answer])=>`<h3>${escapeHtml(question)}</h3><p>${escapeHtml(answer)}</p>`).join('')}</section>` : null;
+  const howToJson = a.slug==='convert-whatsapp-chat-to-pdf' ? \`<script type="application/ld+json">\${JSON.stringify({
+    '@context':'https://schema.org',
+    '@type':'HowTo',
+    name:'How to convert a WhatsApp chat to PDF',
+    description:'Export one WhatsApp conversation, open the TXT or ZIP in ChatToPaper, verify dates and media, customize the PDF, preview it, and download the finished file.',
+    totalTime:'PT5M',
+    tool:[{'@type':'HowToTool',name:'WhatsApp Export Chat'},{'@type':'HowToTool',name:'ChatToPaper'}],
+    supply:[{'@type':'HowToSupply',name:'Exported WhatsApp TXT or ZIP'}],
+    step:[
+      {'@type':'HowToStep',position:1,name:'Export the WhatsApp conversation',text:'Use WhatsApp Export Chat and include media when photos are needed.'},
+      {'@type':'HowToStep',position:2,name:'Open the export in ChatToPaper',text:'Select the exported ZIP, or the TXT and exported photos together.'},
+      {'@type':'HowToStep',position:3,name:'Verify dates and media',text:'Check message dates, participant names, matched photos and any missing-media warnings.'},
+      {'@type':'HowToStep',position:4,name:'Customize the PDF',text:'Choose date range, page size, layout, timestamps and photo settings.'},
+      {'@type':'HowToStep',position:5,name:'Preview and save',text:'Review the printable preview, then create and download the PDF.'}
+    ],
+    url:canonical,
+    image:\`\${SITE}/favicon.png\`
+  }).replace(/</g,'\\\\u003c')}</script>\` : '';
   const jsonLd=`<script type="application/ld+json">${JSON.stringify({
     '@context':'https://schema.org','@type':'BlogPosting',headline:a.title,description:a.description,datePublished:a.published,dateModified:a.updated,
     mainEntityOfPage:canonical,inLanguage:'en-US',keywords:a.keyword,
@@ -130,7 +148,7 @@ function articleHtml(a){
   const related=rel.map(r=>`<a href="/blog/${r.slug}/">${escapeHtml(r.title)}</a>`).join('');
   let main=`<main class="article"><div class="crumbs"><a href="/">Home</a> / <a href="/blog/">Guides</a> / <a href="/blog/category/${slugifyCategory(a.category)}/">${escapeHtml(a.category)}</a></div><div class="eyebrow">${escapeHtml(a.category)} · Updated <time datetime="${a.updated}">${new Date(a.updated+'T00:00:00Z').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',timeZone:'UTC'})}</time></div><h1>${escapeHtml(a.title)}</h1><p class="meta">By <a href="/about/">ChatToPaper</a> · <a href="/editorial-policy/">How we review guides</a></p><p class="lede">${escapeHtml(a.description)}</p><div class="answerbox"><strong>Short answer</strong><p>${escapeHtml(a.answer)}</p></div><h2>What matters most</h2><p>${escapeHtml(categoryAdvice(a))}</p><p>For this specific question — <strong>${escapeHtml(a.keyword)}</strong> — the practical goal is not to make the export look exactly like the WhatsApp app. The goal is a document that is complete enough to understand, honest about anything missing, and predictable when printed or shared.</p><h2>A dependable workflow</h2><ol class="steps">${steps}</ol><h2>What to verify in the preview</h2><div class="trust"><div><strong>Messages</strong><p>Check that the conversation starts and ends where you expect and that multiline messages remain together.</p></div><div><strong>Dates & senders</strong><p>Confirm the date order, timestamp style and participant names before treating the PDF as a record.</p></div><div><strong>Photos</strong><p>Compare the matched-photo count with your expectation and investigate placeholders before download.</p></div></div><h2>Common mistakes to avoid</h2><ul>${pitfalls}</ul><h2>What the PDF can and cannot prove</h2><p>A formatted PDF is useful for reading, printing and sharing, but it is not a forensic export. ChatToPaper does not recover deleted messages, bypass WhatsApp restrictions, authenticate who sent a message, or certify a conversation as legal evidence. If authenticity or admissibility matters, preserve the original files and get advice appropriate to your situation.</p><div class="callout"><strong>Want to make the document now?</strong><p>ChatToPaper lets you import one WhatsApp export, choose a date range, preview the pages and create a printable PDF with supported photos. The selected chat files are processed locally in your browser.</p><a class="btn" href="/#converter">Create your WhatsApp PDF</a></div>${sourceNote(a)}<h2>Related guides</h2><div class="related">${related}</div><p class="source">This page is part of ChatToPaper’s focused guide library. We use AI-assisted drafting for structure and breadth, then check claims against the behavior of ChatToPaper and official product documentation. See our <a href="/editorial-policy/">editorial policy</a>.</p></main>`;
   if (detailedBody) main = main.replace(/<h2>What matters most<\/h2>[\s\S]*?(?=<div class="callout">)/, detailedBody);
-  return layout({title:`${a.title} | ChatToPaper`,description:a.description,canonical,main,type:'article',jsonLd});
+  return layout({title:`${a.title} | ChatToPaper`,description:a.description,canonical,main,type:'article',jsonLd:jsonLd+howToJson});
 }
 
 // Blog index and category hubs.
