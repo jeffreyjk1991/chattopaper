@@ -27,7 +27,9 @@ for (const url of urls) {
 }
 for(const article of articles){
   const html=read(`blog/${article.slug}/index.html`);
-  const schema=JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  const schemas=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m=>JSON.parse(m[1]));
+  const schema=schemas.find(s=>s && s['@type']==='BlogPosting');
+  assert.ok(schema,`BlogPosting schema missing: ${article.slug}`);
   assert.equal(schema.dateModified,article.updated);
   assert.ok(html.includes(`datetime="${article.updated}"`));
   assert.ok(sitemap.includes(`/blog/${article.slug}/</loc><lastmod>${article.updated}</lastmod>`));
