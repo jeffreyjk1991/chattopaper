@@ -49,3 +49,5 @@ ChatToPaper is an independent formatting tool and is not affiliated with, endors
 - [How to convert a WhatsApp chat to PDF](https://chattopaper.com/blog/convert-whatsapp-chat-to-pdf/)
 - [WhatsApp chat to PDF with photos](https://chattopaper.com/blog/print-whatsapp-chat-with-photos/)
 - [WhatsApp customer orders as business records](https://chattopaper.com/blog/whatsapp-customer-orders-business-records/)
+
+- [Free WhatsApp Export Checker](https://chattopaper.com/tools/whatsapp-export-checker/) — inspect message counts, dates, missing photos and omitted media locally in your browser.
