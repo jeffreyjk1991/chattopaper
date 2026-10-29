@@ -10,6 +10,8 @@ test('free launch bypasses Stripe before PDF creation',()=>{
   assert.match(app,/if\(freeLaunchMode\) state\.paymentUnlocked=true/);
   assert.match(home,/Download PDF — Free/);
   assert.match(home,/<s>99¢<\/s>/);
+  assert.match(app,/FREE MODE: skip the old confirmation\/payment dialog and download immediately/);
+  assert.match(app,/setTimeout\(\(\)=>location\.assign\('\/'\),500\)/);
 });
 
 test('build controls free launch from Vercel environment',()=>{
