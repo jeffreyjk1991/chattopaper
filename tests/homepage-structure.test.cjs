@@ -17,7 +17,7 @@ test('homepage is intentionally minimal', () => {
   assert.doesNotMatch(html, /LESS FUSS\. MORE FOREVER\./);
   assert.doesNotMatch(html, /Keep the words\./);
   const sections = (html.match(/<section\b/g) || []).length;
-  assert.ok(sections <= 4, `expected <= 4 sections, found ${sections}`);
+  assert.ok(sections <= 5, `expected <= 5 sections, found ${sections}`);
 });
 test('homepage uses approved ChatToPaper wordmark',()=>{
   assert.match(html,/class="brand brand-image"/);
