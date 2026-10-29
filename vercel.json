@@ -197,11 +197,6 @@
       "permanent": true
     },
     {
-      "source": "/blog/whatsapp-stickers-pdf/",
-      "destination": "/blog/print-whatsapp-chat-with-photos/",
-      "permanent": true
-    },
-    {
       "source": "/blog/whatsapp-photos-correct-order/",
       "destination": "/blog/whatsapp-photos-missing-from-pdf/",
       "permanent": true
