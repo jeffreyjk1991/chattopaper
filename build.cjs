@@ -179,7 +179,7 @@ write('payment-success/index.html',`<!doctype html><html lang="en"><head><meta c
 // Link-worthy diagnostic tool: all analysis stays in the browser.
 const checkerImporter = read('src/importer.js').replace(/<\/script/gi, '<\\/script');
 const checkerZip = zipLib.replace(/<\/script/gi, '<\\/script');
-const checkerScript = String.raw\`
+const checkerScript = String.raw`
 (function(){
   const input=document.getElementById('checker-files');
   const status=document.getElementById('checker-status');
@@ -236,19 +236,19 @@ const checkerScript = String.raw\`
     }
   }
   input.addEventListener('change',inspect);
-})();\`.replace(/<\/script/gi,'<\\/script');
+})();`.replace(/<\/script/gi,'<\\/script');
 
-const checkerJson = \`<script type="application/ld+json">\${JSON.stringify({
+const checkerJson = `<script type="application/ld+json">\${JSON.stringify({
   '@context':'https://schema.org','@type':'WebApplication',
   name:'WhatsApp Export Checker by ChatToPaper',
-  url:\`\${SITE}/tools/whatsapp-export-checker/\`,
+  url:`\${SITE}/tools/whatsapp-export-checker/`,
   applicationCategory:'UtilitiesApplication',
   operatingSystem:'Any modern web browser',
   description:'Free private WhatsApp export checker that analyzes an exported TXT or ZIP locally and reports messages, dates, media matches, missing photos, omitted media and warnings.',
   offers:{'@type':'Offer',price:'0',priceCurrency:'USD'},
-  provider:{'@type':'Organization','@id':\`\${SITE}/#org\`,name:'ChatToPaper'}
-}).replace(/</g,'\\\\u003c')}</script>\`;
-const checkerMain = \`<main class="article checker-page">
+  provider:{'@type':'Organization','@id':`\${SITE}/#org`,name:'ChatToPaper'}
+}).replace(/</g,'\\\\u003c')}</script>`;
+const checkerMain = `<main class="article checker-page">
   <div class="eyebrow">FREE · PRIVATE · NO ACCOUNT</div>
   <h1>WhatsApp Export Checker</h1>
   <p class="lede">Check a WhatsApp TXT or ZIP before turning it into a PDF. See message count, date range, participants, matched photos, missing photos, “Media omitted” items and date warnings. The files are analyzed locally in your browser.</p>
@@ -279,17 +279,17 @@ const checkerMain = \`<main class="article checker-page">
   </tbody></table></div>
   <h2>Common fixes after checking</h2>
   <p>If media is missing, <a href="/blog/whatsapp-export-media-omitted/">learn what “Media omitted” means</a> or use the <a href="/blog/whatsapp-photos-missing-from-pdf/">missing-photo checklist</a>. If the export looks complete, continue to the <a href="/blog/convert-whatsapp-chat-to-pdf/">full WhatsApp-to-PDF guide</a>.</p>
-</main>\`;
-const checkerCss = \`<style>
+</main>`;
+const checkerCss = `<style>
 .checker-page{max-width:980px}.checker-box{padding:28px;border:1px solid #dcdad1;border-radius:18px;background:#fff;margin:30px 0}.checker-button{display:inline-block;cursor:pointer}.checker-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:18px 0 26px}.checker-card{border:1px solid #dedcd3;border-radius:14px;padding:18px;background:#fff}.checker-card small,.checker-card span{display:block}.checker-card small{font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.72rem}.checker-card strong{display:block;font-size:1.7rem;margin:7px 0}.checker-card span{color:#5e5c56;font-size:.9rem}.checker-page .answerbox{margin:22px 0}
-</style>\`;
+</style>`;
 write('tools/whatsapp-export-checker/index.html',
   layout({
     title:'Free WhatsApp Export Checker — Messages, Photos & Media | ChatToPaper',
     description:'Free private WhatsApp export checker. Analyze a TXT or ZIP locally to see message count, date range, missing photos, Media omitted items and export warnings.',
-    canonical:\`\${SITE}/tools/whatsapp-export-checker/\`,
+    canonical:`\${SITE}/tools/whatsapp-export-checker/`,
     jsonLd:checkerJson,
-    main:checkerMain+checkerCss+\`<script>\${checkerZip}</script><script>\${checkerImporter}</script><script>\${checkerScript}</script>\`
+    main:checkerMain+checkerCss+`<script>\${checkerZip}</script><script>\${checkerImporter}</script><script>\${checkerScript}</script>`
   })
 );
 
