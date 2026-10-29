@@ -62,6 +62,15 @@
           "value": "noindex,follow"
         }
       ]
+    },
+    {
+      "source": "/favicon.png",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
     }
   ],
   "trailingSlash": true,
@@ -415,6 +424,12 @@
       "source": "/ChatToPaper.html",
       "destination": "/",
       "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon.png"
     }
   ]
 }
