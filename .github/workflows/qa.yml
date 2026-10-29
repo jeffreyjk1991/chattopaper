@@ -39,7 +39,7 @@ jobs:
         run: |
           set -e
           curl --fail --show-error --silent --retry 6 --retry-delay 3 \
-            -X POST https://chattopaper.com/api/pdf-count \
+            -X POST https://chattopaper.com/api/pdf-count/ \
             -H 'Origin: https://chattopaper.com' \
             -H 'Content-Type: application/json' \
             -H 'User-Agent: ChatToPaper-QA/1.0' \
