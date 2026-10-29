@@ -74,12 +74,8 @@ async function main(){
     assert.ok(await page.locator('#preview-canvas').evaluate(el=>el.width>0 && el.height>0));
     assert.match(await page.locator('#download-open').innerText(),/Download PDF — Free/);
     const pagesBefore=context.pages().length;
-    await page.locator('#download-open').click();
-    await page.locator('#download-dialog').waitFor({state:'visible'});
-    assert.match(await page.locator('#download-status').innerText(),/no checkout required/i);
-
     const downloadPromise=page.waitForEvent('download',{timeout:30000});
-    await page.locator('#download-confirm').click();
+    await page.locator('#download-open').click();
     const download=await downloadPromise;
     const saved=await download.path();
     assert.ok(saved,'browser download path missing');
@@ -91,10 +87,11 @@ async function main(){
     assert.equal(pdf.getProducer(),'ChatToPaper — processed locally');
     assert.ok(pdf.getPageCount()>=1);
     assert.equal(context.pages().length,pagesBefore,'free launch unexpectedly opened a checkout tab');
+    await page.waitForURL(base+'/',{timeout:10000});
+    assert.equal(await page.locator('#download-dialog').isVisible(),false,'free launch unexpectedly showed the old confirmation popup');
     assert.deepEqual(pageErrors,[],'desktop page errors: '+pageErrors.join('; '));
 
-    await page.locator('#download-return').click();
-    await page.locator('#clear-file').click();
+    await page.locator('#file-input').setInputFiles({name:'broken.zip',mimeType:'application/zip',buffer:Buffer.from('broken zip')});
     await page.locator('#file-input').setInputFiles({name:'broken.zip',mimeType:'application/zip',buffer:Buffer.from('broken zip')});
     await page.waitForFunction(()=>document.querySelector('#message-count')?.textContent.trim()==='0' && !document.querySelector('#import-error')?.hidden && document.querySelector('#import-error')?.textContent.trim().length>0,null,{timeout:10000});
     assert.match(await page.locator('#import-error').innerText(),/zip|archive/i);
