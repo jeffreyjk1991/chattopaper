@@ -34,18 +34,3 @@ jobs:
         run: google-chrome --version
       - name: Browser end-to-end flow
         run: node tests/e2e.cjs
-      - name: Install Neon function bundler dependencies
-        run: npm install --no-save pg @neon/functions esbuild
-      - name: Bundle Neon PDF counter function
-        run: |
-          mkdir -p neon-counter-dist
-          ./node_modules/.bin/esbuild neon-counter/index.mjs --bundle --platform=node --target=node24 --format=esm --banner:js="import{createRequire as ___cr}from'module';import{fileURLToPath as ___f}from'url';import{dirname as ___d}from'path';const require=___cr(import.meta.url);const __filename=___f(import.meta.url);const __dirname=___d(__filename);" --outfile=neon-counter-dist/index.mjs
-          cd neon-counter-dist
-          zip -j ../neon-counter-function.zip index.mjs
-      - name: Upload Neon function bundle
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: neon-counter-function
-          path: neon-counter-function.zip
-          if-no-files-found: error
-          retention-days: 1
