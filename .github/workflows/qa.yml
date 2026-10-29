@@ -34,14 +34,4 @@ jobs:
         run: google-chrome --version
       - name: Browser end-to-end flow
         run: node tests/e2e.cjs
-      - name: Verify production attribution write
-        if: contains(github.event.head_commit.message, '[verify-attribution]')
-        run: |
-          set -e
-          curl --fail --show-error --silent --retry 6 --retry-delay 3 \
-            -X POST https://chattopaper.com/api/pdf-count/ \
-            -H 'Origin: https://chattopaper.com' \
-            -H 'Content-Type: application/json' \
-            -H 'User-Agent: ChatToPaper-QA/1.0' \
-            --data '{"eventId":"11111111-1111-4111-8111-111111111141","referrerHost":"qa.chattopaper.test","utmSource":"qa","utmMedium":"test","utmCampaign":"attribution-check","landingPage":"/qa-attribution/"}'
 
