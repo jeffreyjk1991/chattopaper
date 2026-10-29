@@ -346,6 +346,17 @@
   function openDownload() {
     if(!state.doc||state.dirty||state.rendering||!state.active)return;
     if(!state.dateConfirmed){$('import-warnings').scrollIntoView({behavior:'smooth',block:'center'});$('confirm-dates')?.focus({preventScroll:true});toast('Choose the date order or confirm the dates in your preview.');return;}
+
+    // FREE MODE: skip the old confirmation/payment dialog and download immediately.
+    // To restore the popup later, remove/disable this block and the existing
+    // confirmation/payment dialog code below will become active again.
+    if(freeLaunchMode){
+      state.paymentUnlocked=true;
+      void downloadPDF();
+      return;
+    }
+
+    // Legacy confirmation/payment dialog intentionally retained for future paid mode.
     $('download-title').textContent=state.doc.options.title;
     $('download-summary').replaceChildren();
     for(const [value,label] of [[state.doc.stats.messageCount,'messages'],[state.doc.stats.photoCount,'photos'],[state.doc.pages.length,'pages']]){
@@ -395,7 +406,13 @@
   function savePreparedPDF() {
     if(!state.downloadURL)return false;
     const anchor=document.createElement('a');anchor.href=state.downloadURL;anchor.download=state.downloadName||'ChatToPaper conversation.pdf';
-    document.body.append(anchor);anchor.click();anchor.remove();return true;
+    document.body.append(anchor);anchor.click();anchor.remove();
+
+    // Return to a clean homepage after the browser has accepted the download.
+    // Keeping this navigation here means both freshly generated and already-prepared
+    // PDFs follow the same simple completion flow.
+    setTimeout(()=>location.assign('/'),500);
+    return true;
   }
   async function createPDF({attemptSave=true}={}) {
     if(state.exporting||!state.doc||!state.dateConfirmed)return;
