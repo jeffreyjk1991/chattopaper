@@ -32,6 +32,8 @@ module.exports=async function handler(req,res){
       const deviceType=/ipad|tablet|kindle|silk/i.test(ua)?'tablet':(/mobi|android|iphone|ipod/i.test(ua)?'mobile':'desktop');
       body=JSON.stringify({
         eventId,
+        country:String((req.headers&&req.headers['x-vercel-ip-country'])||'').slice(0,8)||null,
+        region:String((req.headers&&req.headers['x-vercel-ip-country-region'])||'').slice(0,80)||null,
         referrerHost:String((input&&input.referrerHost)||'direct').slice(0,255),
         utmSource:String((input&&input.utmSource)||'').slice(0,120)||null,
         utmMedium:String((input&&input.utmMedium)||'').slice(0,120)||null,
