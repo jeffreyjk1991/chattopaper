@@ -141,7 +141,7 @@ const cards=articles.map(a=>`<article class="card"><small>${escapeHtml(a.categor
 const guideWalkthrough=`<section class="guide-walkthrough" aria-labelledby="how-it-works-title">
   <div class="walkthrough-copy">
     <div class="eyebrow">HOW CHATTOPAPER WORKS</div>
-    <h1 id="how-it-works-title">From WhatsApp export to PDF in three steps.</h1>
+    <h2 id="how-it-works-title">From WhatsApp export to PDF in three steps.</h2>
     <p>Export your chat from WhatsApp, make any quick adjustments, then save a clean PDF. Your selected chat files stay in your browser.</p>
   </div>
   <div class="walkthrough-steps" aria-label="Three steps to create a WhatsApp PDF">
