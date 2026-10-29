@@ -1,8 +1,30 @@
+const { Pool } = require('pg');
+
+const pool = globalThis.__chattopaperPdfEventPool || new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 2,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000
+});
+globalThis.__chattopaperPdfEventPool = pool;
+
 function send(res,status,body){
   res.statusCode=status;
   res.setHeader('content-type','application/json; charset=utf-8');
   res.setHeader('cache-control','no-store, max-age=0');
   res.end(JSON.stringify(body));
+}
+
+function clean(value,max=300){
+  const text=String(value||'').trim();
+  return text ? text.slice(0,max) : null;
+}
+
+function deviceType(userAgent){
+  const ua=String(userAgent||'');
+  if(/ipad|tablet|kindle|silk/i.test(ua)) return 'tablet';
+  if(/mobi|android|iphone|ipod/i.test(ua)) return 'mobile';
+  return 'desktop';
 }
 
 module.exports=async function handler(req,res){
@@ -12,53 +34,44 @@ module.exports=async function handler(req,res){
   }
 
   try{
-    const url=process.env.PDF_COUNTER_FUNCTION_URL;
-    const secret=process.env.PDF_COUNTER_SECRET;
-    if(!url||!secret) throw new Error('counter_not_configured');
+    if(!process.env.DATABASE_URL) throw new Error('database_not_configured');
 
-    let body;
-    if(req.method==='POST'){
-      const origin=String(req.headers&&req.headers.origin||'');
-      if(origin&&origin!=='https://chattopaper.com'&&origin!=='https://www.chattopaper.com'){
-        return send(res,403,{error:'forbidden_origin'});
-      }
-      let input=req.body;
-      if(typeof input==='string'){try{input=JSON.parse(input);}catch(_){input={};}}
-      const eventId=String(input&&input.eventId||'');
-      if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(eventId)){
-        return send(res,400,{error:'invalid_event'});
-      }
-      const ua=String((req.headers&&req.headers['user-agent'])||'');
-      const deviceType=/ipad|tablet|kindle|silk/i.test(ua)?'tablet':(/mobi|android|iphone|ipod/i.test(ua)?'mobile':'desktop');
-      body=JSON.stringify({
-        eventId,
-        country:String((req.headers&&req.headers['x-vercel-ip-country'])||'').slice(0,8)||null,
-        region:String((req.headers&&req.headers['x-vercel-ip-country-region'])||'').slice(0,80)||null,
-        referrerHost:String((input&&input.referrerHost)||'direct').slice(0,255),
-        utmSource:String((input&&input.utmSource)||'').slice(0,120)||null,
-        utmMedium:String((input&&input.utmMedium)||'').slice(0,120)||null,
-        utmCampaign:String((input&&input.utmCampaign)||'').slice(0,180)||null,
-        landingPage:String((input&&input.landingPage)||'/').slice(0,300),
-        deviceType
-      });
+    if(req.method==='GET'){
+      const {rows}=await pool.query('SELECT count(*)::bigint AS total FROM public.pdf_generation_events');
+      return send(res,200,{count:Number(rows[0]?.total||0)});
     }
 
-    const upstream=await fetch(url,{
-      method:req.method,
-      headers:{
-        accept:'application/json',
-        'content-type':'application/json',
-        'x-counter-secret':secret
-      },
-      ...(body?{body}:{}),
-      cache:'no-store'
-    });
+    const origin=String(req.headers&&req.headers.origin||'');
+    if(origin&&origin!=='https://chattopaper.com'&&origin!=='https://www.chattopaper.com'){
+      return send(res,403,{error:'forbidden_origin'});
+    }
 
-    const data=await upstream.json().catch(()=>({}));
-    if(!upstream.ok) throw new Error('counter_function_'+upstream.status);
-    const count=Number(data&&data.count);
-    if(!Number.isFinite(count)) throw new Error('invalid_counter_response');
-    return send(res,200,{count});
+    let input=req.body;
+    if(typeof input==='string'){try{input=JSON.parse(input);}catch(_){input={};}}
+    const eventId=String(input&&input.eventId||'');
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(eventId)){
+      return send(res,400,{error:'invalid_event'});
+    }
+
+    const values=[
+      eventId,
+      clean(req.headers&&req.headers['x-vercel-ip-country'],8),
+      clean(req.headers&&req.headers['x-vercel-ip-country-region'],80),
+      clean(input&&input.referrerHost,255)||'direct',
+      clean(input&&input.utmSource,120),
+      clean(input&&input.utmMedium,120),
+      clean(input&&input.utmCampaign,180),
+      clean(input&&input.landingPage,300)||'/',
+      deviceType(req.headers&&req.headers['user-agent'])
+    ];
+
+    await pool.query(
+      'INSERT INTO public.pdf_generation_events(event_id,country,region,referrer_host,utm_source,utm_medium,utm_campaign,landing_page,device_type) VALUES ($1::uuid,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT (event_id) DO NOTHING',
+      values
+    );
+
+    const {rows}=await pool.query('SELECT count(*)::bigint AS total FROM public.pdf_generation_events');
+    return send(res,200,{count:Number(rows[0]?.total||0)});
   }catch(error){
     console.error('pdf-count',error&&error.message?error.message:error);
     return send(res,503,{error:'counter_unavailable'});
