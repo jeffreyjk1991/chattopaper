@@ -224,6 +224,7 @@
     clearTimeout(state.timer);state.revision++;disposeDoc();revokeMedia();clearPaymentHandoff();state.source=null;state.parsed=null;state.linked=null;state.messages=[];state.active=false;state.uiWarnings=[];state.dateConfirmed=true;state.page=0;state.rendering=false;state.dirty=false;
     resetSettings();$('document-title').value='';$('file-name').textContent='';$('file-name').removeAttribute('title');$('file-meta').textContent='';updateDates(true);updateParticipants();renderWarnings();setError('');
     $('preview-transcript').textContent='';$('preview-canvas').width=1;$('preview-canvas').height=1;$('preview-loading').hidden=true;
+    $('inline-download-wrap').hidden=true;$('inline-download-progress').value=0;$('inline-download-status').textContent='Preparing your PDF…';
     $('step-customize').classList.remove('current');$('step-download').classList.remove('current');$('preview-tag').textContent='No chat';
     document.querySelectorAll('.sample-prompt').forEach(el=>{el.hidden=false;});
     emptyPreview('Ready for your conversation.','Choose a ZIP or TXT with photos to get started.');
@@ -419,11 +420,16 @@
     if(state.downloadURL){if(attemptSave)savePreparedPDF();return;}
     const doc=state.doc;state.exporting=true;
     const dialog=$('download-dialog');const button=$('download-confirm');const close=dialog.querySelector('.dialog-close');
+    const inlineWrap=$('inline-download-wrap'),inlineProgress=$('inline-download-progress'),inlineStatus=$('inline-download-status');
+    inlineWrap.hidden=false;inlineProgress.value=0;inlineStatus.textContent='Preparing your PDF…';
+    $('download-open').replaceChildren(document.createTextNode('Creating PDF…'),icon('download'));
     button.disabled=true;close.disabled=true;$('download-return').disabled=true;$('download-progress').hidden=false;$('download-progress').value=0;
     button.replaceChildren(document.createTextNode('Making your PDF…'));updateDownloadEnabled();
     try {
       const blob=await ChatDocument.exportPDF(doc,(page,total)=>{
-        $('download-progress').value=page/total;$('download-status').textContent=`Preparing page ${page} of ${total}. Keep this tab open.`;
+        const value=page/total;
+        $('download-progress').value=value;$('download-status').textContent=`Preparing page ${page} of ${total}. Keep this tab open.`;
+        inlineProgress.value=value;inlineStatus.textContent=`Preparing page ${page} of ${total}…`;
       });
       if(state.downloadURL)releaseURL(state.downloadURL);
       state.downloadURL=await localBlobURL(blob);
@@ -436,10 +442,12 @@
       void recordPdfUsage();
       track('pdf_ready',{pages:doc.pages.length,bytes:blob.size});
       button.replaceChildren(document.createTextNode('Save PDF'),icon('download'));
+      inlineProgress.value=1;inlineStatus.textContent='Download ready — opening file…';
       if(attemptSave){savePreparedPDF();track('pdf_downloaded',{pages:doc.pages.length,bytes:blob.size});}
       else toast('Your PDF is ready to save.');
     }catch(error){
       $('download-status').textContent=error.message||'The PDF could not be generated. Try a smaller date range.';
+      inlineWrap.hidden=false;inlineStatus.textContent='PDF creation failed — try again.';inlineProgress.value=0;
       button.replaceChildren(document.createTextNode('Try download again'),icon('download'));toast('The PDF could not finish. Please try again.',true);
     }finally{state.exporting=false;button.disabled=false;close.disabled=false;$('download-return').disabled=false;updateDownloadEnabled();}
   }
