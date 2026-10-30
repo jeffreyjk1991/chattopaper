@@ -205,7 +205,7 @@ test('unrelated XML is rejected instead of pretending to be SMS', async () => {
   assert.equal(await SmsImport.readFiles([file('contacts.xml',xml)]),null);
 });
 
-test('random SQLite database is rejected instead of pretending to be Apple Messages', async () => {
+test('random SQLite database is rejected safely instead of pretending to be Apple Messages', async () => {
   const fake=Buffer.alloc(4096);Buffer.from('SQLite format 3\0').copy(fake,0);fake.writeUInt16BE(4096,16);
-  assert.equal(await AppleMessages.readFiles([file('other.db',fake)]),null);
+  await assert.rejects(AppleMessages.readFiles([file('other.db',fake)]),error=>['INVALID_DB','NOT_APPLE_DB'].includes(error.code));
 });
