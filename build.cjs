@@ -31,6 +31,7 @@ const scripts = {
   '/*__PDF_LIB__*/': pdfLib,
   '/*__ZIP_LIB__*/': zipLib,
   '/*__IMPORTER__*/': read('src/importer.js'),
+  '/*__STRUCTURED_IMPORTER__*/': read('src/structured-importer.js'),
   '/*__DOCUMENT__*/': read('src/document.js'),
   '/*__APP__*/': read('src/app.js'),
 };
