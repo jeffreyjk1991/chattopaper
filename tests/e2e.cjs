@@ -34,7 +34,7 @@ function makeZip(entries){
   return Buffer.concat([...local,dir,end]);
 }
 
-const JPEG=Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAACAAIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6pooooA//2Q==','base64');
+const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64');
 const fixtureSource=fs.readFileSync(path.join(__dirname,'importer-regression.test.cjs'),'utf8');
 const appleMatch=fixtureSource.match(/const APPLE_DB_FIXTURE = gunzipSync\(Buffer\.from\('([^']+)'/);
 assert.ok(appleMatch,'Apple Messages DB fixture missing');
@@ -147,19 +147,19 @@ async function main(){
     const telegramFull=JSON.stringify({chats:{list:[
       {id:10,name:'Other Telegram Chat',messages:[{id:1,type:'message',date:'2026-10-28T09:00:00',from:'Other',text:'Skip me'}]},
       {id:20,name:'Telegram QA',messages:[
-        {id:2,type:'message',date:'2026-10-28T10:15:00',from:'Alex',text:'Telegram hello',photo:'photos/tg.jpg'},
+        {id:2,type:'message',date:'2026-10-28T10:15:00',from:'Alex',text:'Telegram hello',photo:'photos/tg.png'},
         {id:3,type:'message',date:'2026-10-28T10:16:00',from:'Jamie',text:'Telegram reply'}
       ]}
     ]}});
-    const telegramZip=makeZip([{name:'result.json',content:telegramFull},{name:'photos/tg.jpg',content:JPEG}]);
+    const telegramZip=makeZip([{name:'result.json',content:telegramFull},{name:'photos/tg.png',content:PNG}]);
 
     const instagramThread=JSON.stringify({title:'Instagram QA',participants:[{name:'Alex'},{name:'Jamie'}],messages:[
       {sender_name:'Jamie',timestamp_ms:1793181660000,content:'Instagram reply'},
-      {sender_name:'Alex',timestamp_ms:1793181600000,content:'Instagram hello',photos:[{uri:'your_instagram_activity/messages/inbox/instagram_qa/photos/ig.jpg'}]}
+      {sender_name:'Alex',timestamp_ms:1793181600000,content:'Instagram hello',photos:[{uri:'your_instagram_activity/messages/inbox/instagram_qa/photos/ig.png'}]}
     ]});
     const instagramZip=makeZip([
       {name:'your_instagram_activity/messages/inbox/instagram_qa/message_1.json',content:instagramThread},
-      {name:'your_instagram_activity/messages/inbox/instagram_qa/photos/ig.jpg',content:JPEG}
+      {name:'your_instagram_activity/messages/inbox/instagram_qa/photos/ig.png',content:PNG}
     ]);
 
     const messengerA=JSON.stringify({title:'Other Messenger',participants:[{name:'A'},{name:'B'}],messages:[
