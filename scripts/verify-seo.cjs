@@ -43,7 +43,7 @@ for(const article of articles){
 
 for(const guide of platformSeoGuides){
   const html=read(`blog/${guide.slug}/index.html`);
-  const schemas=[...html.matchAll(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/g)].map(m=>JSON.parse(m[1]));
+  const schemas=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m=>JSON.parse(m[1]));
   const posting=schemas.find(s=>s&&s['@type']==='BlogPosting');
   assert.ok(posting,`Platform BlogPosting schema missing: ${guide.slug}`);
   assert.equal(posting.dateModified,guide.updated);
