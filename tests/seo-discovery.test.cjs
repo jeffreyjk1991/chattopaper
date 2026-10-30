@@ -114,18 +114,16 @@ test('search discovery covers all supported chat platforms',()=>{
 
 test('guides landing page visibly represents every supported platform',()=>{
   const build=fs.readFileSync('build.cjs','utf8');
-  for(const label of ['WhatsApp → PDF','Telegram → PDF','Instagram → PDF','Messenger → PDF','iMessage → PDF','SMS → PDF']){
-    assert.ok(build.includes(label),label+' missing from Guides landing architecture');
-  }
+  const platformData=fs.readFileSync('content/platform-seo-guides.cjs','utf8');
+  for(const name of ['Telegram','Instagram','Messenger','iMessage','SMS']) assert.ok(platformData.includes("name:'"+name+"'"),name+' platform data missing');
   for(const text of [
     'GUIDES BY PLATFORM',
     'platform-grid',
-    'Complete Telegram → PDF guide',
-    'Complete Instagram → PDF guide',
-    'Complete Messenger → PDF guide',
-    'Complete iMessage → PDF guide',
-    'Complete SMS → PDF guide',
+    'platformDirectoryItems',
+    'Complete WhatsApp → PDF guide',
+    'Complete ${p.name} → PDF guide',
     'DEEPER WHATSAPP LIBRARY',
     'FREE WHATSAPP TOOL'
   ]) assert.ok(build.includes(text),text+' missing from Guides landing architecture');
+  for(const hub of ['telegram','instagram','messenger','imessage','sms']) assert.ok(platformData.includes("hub:'"+hub+"'"),hub+' hub missing');
 });
