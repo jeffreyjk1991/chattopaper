@@ -61,7 +61,6 @@ async function runPlatformCase(context,base,fixture){
   const page=await context.newPage();
   const errors=[]; page.on('pageerror',e=>errors.push(String(e)));
   await page.goto(base+'/',{waitUntil:'domcontentloaded'});
-  await page.locator('#document-title').fill(fixture.pdfTitle);
   await page.locator('#file-input').setInputFiles(fixture.files);
   if(fixture.choiceTitle){
     await page.waitForFunction(()=>!document.querySelector('#conversation-choice')?.hidden,null,{timeout:15000});
@@ -71,6 +70,8 @@ async function runPlatformCase(context,base,fixture){
     await page.locator('#conversation-open').click();
   }
   await waitText(page,'#message-count',String(fixture.messages));
+  await page.locator('.customize-panel').evaluate(el=>{if(!el.open)el.open=true;});
+  await page.locator('#document-title').fill(fixture.pdfTitle);
   await page.waitForFunction(()=>Number(document.querySelector('#page-count')?.textContent)>0,null,{timeout:20000});
   assert.match(await page.locator('#file-meta').innerText(),fixture.platformLabel);
   const transcript=await page.locator('#preview-transcript').innerText();
