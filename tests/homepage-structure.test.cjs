@@ -13,7 +13,7 @@ test('minimal homepage keeps converter-critical controls', () => {
 test('homepage is intentionally minimal', () => {
   assert.match(html, /Turn your chats into clean PDFs/);
   assert.match(html, /Customize PDF/);
-  assert.match(html, /WhatsApp<\/strong> · <strong>Telegram<\/strong> · <strong>Instagram<\/strong> · <strong>Messenger<\/strong> · <strong>iMessage<\/strong> · <strong>SMS/);
+  assert.ok(html.includes('<strong>WhatsApp</strong> · <strong>Telegram</strong> · <strong>Instagram</strong> · <strong>Messenger</strong> · <strong>iMessage</strong> · <strong>SMS</strong>'));
   assert.doesNotMatch(html, /BIG FEELINGS\. SMALL PRICE\./);
   assert.doesNotMatch(html, /LESS FUSS\. MORE FOREVER\./);
   assert.doesNotMatch(html, /Keep the words\./);
