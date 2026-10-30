@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {deflateRawSync} = require('node:zlib');
 const Import = require('../src/importer.js');
+const Structured = require('../src/structured-importer.js');
 
 function zip(entries, options = {}) {
   const local = [], central = [];
@@ -69,4 +70,57 @@ test('harmless trailing provider metadata after EOCD does not invalidate the ZIP
 
 test('damaged ZIPs still fail clearly', async () => {
   await assert.rejects(Import.readFiles([file('broken.zip','not-a-zip')]), error => error.code==='INVALID_ZIP');
+});
+
+test('Telegram JSON export is detected and converted into normalized messages', async () => {
+  const json=JSON.stringify({
+    name:'Family Chat',
+    type:'personal_chat',
+    messages:[
+      {id:1,type:'message',date:'2026-10-28T09:15:00',from:'Alex',text:'Morning'},
+      {id:2,type:'message',date:'2026-10-28T09:16:00',from:'Jamie',text:[{type:'plain','text':'Coffee?'}]}
+    ]
+  });
+  const source=await Structured.readFiles([file('result.json',json)]);
+  assert.equal(source.platform,'telegram');
+  assert.equal(source.conversationTitle,'Family Chat');
+  assert.equal(source.parsed.stats.userMessages,2);
+  assert.deepEqual(source.parsed.participants,['Alex','Jamie']);
+  assert.equal(source.parsed.messages[1].text,'Coffee?');
+});
+
+test('Telegram full export asks for a conversation only after upload', async () => {
+  const json=JSON.stringify({
+    chats:{list:[
+      {id:10,name:'Chat A',messages:[{id:1,type:'message',date:'2026-10-28T09:15:00',from:'A',text:'One'}]},
+      {id:20,name:'Chat B',messages:[{id:2,type:'message',date:'2026-10-28T10:15:00',from:'B',text:'Two'}]}
+    ]}
+  });
+  const first=await Structured.readFiles([file('result.json',json)]);
+  assert.equal(first.needsConversation,true);
+  assert.equal(first.choices.length,2);
+  const selected=await Structured.readFiles([file('result.json',json)],{conversationId:first.choices[1].id});
+  assert.equal(selected.conversationTitle,'Chat B');
+  assert.equal(selected.parsed.messages[0].text,'Two');
+});
+
+test('Meta message archive is detected and photo references can be matched', async () => {
+  const messageJson=JSON.stringify({
+    title:'Taylor',
+    participants:[{name:'Alex'},{name:'Taylor'}],
+    messages:[
+      {sender_name:'Taylor',timestamp_ms:1793181600000,content:'Photo',photos:[{uri:'your_instagram_activity/messages/inbox/taylor/photos/photo.jpg'}]},
+      {sender_name:'Alex',timestamp_ms:1793181540000,content:'Hello'}
+    ]
+  });
+  const archive=zip([
+    {name:'your_instagram_activity/messages/inbox/taylor/message_1.json',content:messageJson},
+    {name:'your_instagram_activity/messages/inbox/taylor/photos/photo.jpg',content:'jpeg'}
+  ]);
+  const source=await Structured.readFiles([file('instagram.zip',archive)]);
+  assert.equal(source.platform,'meta');
+  assert.equal(source.conversationTitle,'Taylor');
+  const linked=Import.linkMedia(source.parsed.messages,source.media);
+  assert.equal(source.parsed.stats.userMessages,2);
+  assert.equal(linked.matchedPhotos,1);
 });
