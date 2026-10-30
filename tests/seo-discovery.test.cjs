@@ -110,3 +110,22 @@ test('search discovery covers all supported chat platforms',()=>{
   assert.match(apple,/SQLite format 3/);
   assert.match(sms,/SMS Backup/);
 });
+
+
+test('guides landing page visibly represents every supported platform',()=>{
+  const build=fs.readFileSync('build.cjs','utf8');
+  for(const label of ['WhatsApp → PDF','Telegram → PDF','Instagram → PDF','Messenger → PDF','iMessage → PDF','SMS → PDF']){
+    assert.ok(build.includes(label),label+' missing from Guides landing architecture');
+  }
+  for(const text of [
+    'GUIDES BY PLATFORM',
+    'platform-grid',
+    'Complete Telegram → PDF guide',
+    'Complete Instagram → PDF guide',
+    'Complete Messenger → PDF guide',
+    'Complete iMessage → PDF guide',
+    'Complete SMS → PDF guide',
+    'DEEPER WHATSAPP LIBRARY',
+    'FREE WHATSAPP TOOL'
+  ]) assert.ok(build.includes(text),text+' missing from Guides landing architecture');
+});
