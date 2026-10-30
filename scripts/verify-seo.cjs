@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const articles = require('../content/articles.cjs');
+const {platforms: seoPlatforms, guides: platformSeoGuides} = require('../content/platform-seo-guides.cjs');
 const root = path.join(__dirname,'../dist');
 const read = file => fs.readFileSync(path.join(root,file),'utf8');
 const sitemap = read('sitemap.xml');
@@ -39,7 +40,25 @@ for(const article of articles){
     assert.ok(html.includes('id="questions"'));
   }
 }
+
+for(const guide of platformSeoGuides){
+  const html=read(`blog/${guide.slug}/index.html`);
+  const schemas=[...html.matchAll(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/g)].map(m=>JSON.parse(m[1]));
+  const posting=schemas.find(s=>s&&s['@type']==='BlogPosting');
+  assert.ok(posting,`Platform BlogPosting schema missing: ${guide.slug}`);
+  assert.equal(posting.dateModified,guide.updated);
+  assert.ok(html.includes(`datetime="${guide.updated}"`));
+  assert.ok(sitemap.includes(`/blog/${guide.slug}/</loc><lastmod>${guide.updated}</lastmod>`));
+  assert.ok(html.includes(`/blog/platform/${guide.hub}/`));
+}
+for(const platform of seoPlatforms){
+  const html=read(`blog/platform/${platform.hub}/index.html`);
+  assert.ok(html.includes(`<h1>${platform.name} → PDF guides</h1>`));
+  assert.ok(sitemap.includes(`/blog/platform/${platform.hub}/</loc>`));
+  for(const guide of platformSeoGuides.filter(g=>g.platform===platform.key)) assert.ok(html.includes(`/blog/${guide.slug}/`));
+}
+
 const feed=read('feed.xml');
 for(const item of [...feed.matchAll(/<pubDate>(.*?)<\/pubDate>/g)]) assert.ok(Number.isFinite(Date.parse(item[1])));
 assert.ok(!sitemap.includes('payment-success') && !sitemap.includes('ChatToPaper.html'));
-console.log(`SEO output verified: ${urls.length} canonical pages, internal links, structured data, dates and ${articles.filter(a=>a.sections).length} detailed guides.`);
+console.log(`SEO output verified: ${urls.length} canonical pages, internal links, structured data, dates, ${articles.filter(a=>a.sections).length} detailed WhatsApp guides and ${platformSeoGuides.length} platform-specific guides.`);
