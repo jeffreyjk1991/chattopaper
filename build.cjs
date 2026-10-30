@@ -442,8 +442,7 @@ write('llms-full.txt',`# ChatToPaper — product and guide reference\n\n## What 
 ## Business-use guidance
 ChatToPaper can help a small business create a readable paper trail from exported WhatsApp conversations. The resulting PDF should be kept as supporting documentation with the related invoice, quote, receipt, work order, purchase order, project file or other formal record. ChatToPaper is not accounting software, invoicing software, a contract-signing service or an evidence-certification service.
 
-## Guide library
-${articles.map(a=>`- ${a.title}: ${SITE}/blog/${a.slug}/`).join('\n')}\n`);
+## Guide library\n${[...platformSeoGuides,...platformGuides,...articles].map(a=>`- ${a.title}: ${SITE}/blog/${a.slug}/`).join('\n')}\n`);
 write('manifest.webmanifest',JSON.stringify({name:'ChatToPaper',short_name:'ChatToPaper',start_url:'/',display:'standalone',background_color:'#f6f5ef',theme_color:'#25d366',description:'Convert WhatsApp, Telegram, Instagram, Messenger, iMessage and SMS conversations to printable PDFs.',icons:[{src:'/favicon.png',sizes:'1254x1254',type:'image/png',purpose:'any maskable'}]},null,2));
 write('404.html',layout({title:'Page not found | ChatToPaper',description:'The requested ChatToPaper page could not be found.',canonical:`${SITE}/404`,robots:'noindex,follow',main:`<main class="article"><div class="eyebrow">404</div><h1>That page slipped away.</h1><p class="lede">Try the guide library or go back to the chat-to-PDF converter.</p><p><a class="btn" href="/blog/">Browse guides</a> <a class="btn" href="/">Go home</a></p></main>`}));
 
