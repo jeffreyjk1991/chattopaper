@@ -19,7 +19,7 @@
   const photoType=name=>PHOTO_TYPES[basename(name).split('.').pop().toLowerCase()]||'application/octet-stream';
 
   function fail(code,message){
-    const ErrorType=root.ChatImport&&BaseImport.ImportError;
+    const ErrorType=BaseImport&&BaseImport.ImportError;
     if(ErrorType)throw new ErrorType(code,message);
     const error=new Error(message);error.code=code;throw error;
   }
