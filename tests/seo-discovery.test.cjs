@@ -85,18 +85,21 @@ test('export checker is crawlable and included in discovery files',()=>{
 });
 
 
-test('search snippets emphasize chat-to-PDF, privacy and Android intent',()=>{
+test('search discovery covers WhatsApp Telegram Instagram and Messenger',()=>{
   const home=fs.readFileSync('src/index.html','utf8');
   const articles=fs.readFileSync('content/articles.cjs','utf8');
   const detailed=fs.readFileSync('content/detailed-guides.cjs','utf8');
   const build=fs.readFileSync('build.cjs','utf8');
-  assert.match(home,/<title>Free WhatsApp Chat to PDF Converter \| Private, No Upload<\/title>/);
-  assert.match(home,/no account or app install/i);
-  assert.match(home,/your chat is not uploaded/i);
+  const structured=fs.readFileSync('src/structured-importer.js','utf8');
+  assert.match(home,/<title>Free Chat to PDF Converter \| WhatsApp, Telegram, Instagram & Messenger<\/title>/);
+  assert.match(home,/WhatsApp · Telegram · Instagram · Messenger/);
+  assert.match(home,/application\/json/);
   assert.match(articles,/How to Export a WhatsApp Chat on Android & Save as PDF/);
-  assert.match(articles,/export whatsapp chat android pdf/);
   assert.match(detailed,/modern Android browser/);
-  assert.match(detailed,/A4 is common in many countries/);
-  assert.match(build,/Android: export a WhatsApp chat and save it as PDF/);
-  assert.match(build,/no ChatToPaper account or app install/);
+  assert.match(build,/telegram-chat-to-pdf/);
+  assert.match(build,/instagram-dm-to-pdf/);
+  assert.match(build,/messenger-chat-to-pdf/);
+  assert.match(build,/Telegram chat to PDF/);
+  assert.match(structured,/telegramChoices/);
+  assert.match(structured,/messages\\\/(inbox|archived_threads|filtered_threads)/);
 });
