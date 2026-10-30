@@ -93,7 +93,7 @@ test('search discovery covers all supported chat platforms',()=>{
   const structured=fs.readFileSync('src/structured-importer.js','utf8');
   const apple=fs.readFileSync('src/apple-messages.js','utf8');
   const sms=fs.readFileSync('src/sms-importer.js','utf8');
-  assert.match(home,/<title>Free Chat to PDF Converter \| WhatsApp, Telegram, Instagram & Messenger<\/title>/);
+  assert.match(home,/<title>Free Chat to PDF Converter \| WhatsApp, Telegram, Instagram, Messenger, iMessage & SMS<\/title>/);
   assert.ok(home.includes('<strong>WhatsApp</strong> · <strong>Telegram</strong> · <strong>Instagram</strong> · <strong>Messenger</strong> · <strong>iMessage</strong> · <strong>SMS</strong>'));
   assert.match(home,/application\/json/);
   assert.match(articles,/How to Export a WhatsApp Chat on Android & Save as PDF/);
