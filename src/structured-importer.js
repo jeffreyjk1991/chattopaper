@@ -9,15 +9,17 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(root){
   'use strict';
 
+  const BaseImport=root.ChatImport||(typeof require==='function'?require('./importer.js'):null);
+  if(!BaseImport)throw new Error('ChatImport is required before the structured importer.');
   const PHOTO_EXT=/\.(jpe?g|png|webp|gif|avif)$/i;
   const PHOTO_TYPES={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif',avif:'image/avif'};
   const pad=n=>String(n).padStart(2,'0');
   const basename=name=>String(name||'').replace(/\\/g,'/').split('/').pop();
-  const normalize=name=>root.ChatImport.normalizeFilename(name);
+  const normalize=name=>BaseImport.normalizeFilename(name);
   const photoType=name=>PHOTO_TYPES[basename(name).split('.').pop().toLowerCase()]||'application/octet-stream';
 
   function fail(code,message){
-    const ErrorType=root.ChatImport&&root.ChatImport.ImportError;
+    const ErrorType=root.ChatImport&&BaseImport.ImportError;
     if(ErrorType)throw new ErrorType(code,message);
     const error=new Error(message);error.code=code;throw error;
   }
@@ -26,7 +28,7 @@
     catch(_){fail('INVALID_JSON','This JSON export could not be read. Use the original Telegram, Instagram or Messenger export.');}
   }
   function decode(bytes){
-    if(bytes.byteLength>root.ChatImport.LIMITS.chatBytes)fail('CHAT_TOO_LARGE','A conversation JSON file exceeds 20 MB. Export a smaller conversation or date range.');
+    if(bytes.byteLength>BaseImport.LIMITS.chatBytes)fail('CHAT_TOO_LARGE','A conversation JSON file exceeds 20 MB. Export a smaller conversation or date range.');
     try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes);}
     catch(_){fail('TEXT_ENCODING','This JSON export is not valid UTF-8. Use the original export without editing it.');}
   }
@@ -76,7 +78,7 @@
     };
   }
   function summarize(messages,platform,warnings){
-    if(messages.length>root.ChatImport.LIMITS.messages)fail('TOO_MANY_MESSAGES','This conversation contains over 20,000 messages. Export a smaller conversation or date range.');
+    if(messages.length>BaseImport.LIMITS.messages)fail('TOO_MANY_MESSAGES','This conversation contains over 20,000 messages. Export a smaller conversation or date range.');
     const participants=Array.from(new Set(messages.filter(m=>m.sender).map(m=>m.sender)));
     const dated=messages.filter(m=>m.timestamp!==null);
     const dates=dated.map(m=>m.dateKey).filter(Boolean).sort();
@@ -160,10 +162,10 @@
     for(let i=0;i<candidates.length;i++){
       const entry=candidates[i];
       if(selected.platform==='meta'&&selected.threadPath&&!String(entry.name).startsWith(selected.threadPath+'/'))continue;
-      if(entry.size>root.ChatImport.LIMITS.entryBytes){warnings.push(`“${basename(entry.name)}” is larger than 40 MB and was left as a placeholder.`);continue;}
-      if(extracted+entry.size>root.ChatImport.LIMITS.expandedBytes){warnings.push('Photos exceeded the safe extraction limit; remaining media were left as placeholders.');break;}
+      if(entry.size>BaseImport.LIMITS.entryBytes){warnings.push(`“${basename(entry.name)}” is larger than 40 MB and was left as a placeholder.`);continue;}
+      if(extracted+entry.size>BaseImport.LIMITS.expandedBytes){warnings.push('Photos exceeded the safe extraction limit; remaining media were left as placeholders.');break;}
       if(typeof options.onProgress==='function')options.onProgress({done:i+1,total:candidates.length,name:basename(entry.name)});
-      const content=await root.ChatImport.extractZipEntry(bytes,entry);
+      const content=await BaseImport.extractZipEntry(bytes,entry);
       extracted+=content.byteLength;
       const name=basename(entry.name),key=normalize(name);
       const item={name,blob:new Blob([content],{type:photoType(name)}),type:photoType(name)};
@@ -185,22 +187,22 @@
     let choices=[],fileName='',bytes=null,entries=[];
     if(zipFiles.length){
       const file=zipFiles[0];
-      if(file.size>root.ChatImport.LIMITS.zipUploadBytes)fail('UPLOAD_TOO_LARGE','Please select an export ZIP under 300 MB.');
+      if(file.size>BaseImport.LIMITS.zipUploadBytes)fail('UPLOAD_TOO_LARGE','Please select an export ZIP under 300 MB.');
       fileName=file.name;
-      bytes=new Uint8Array(await root.ChatImport.readFileBuffer(file));
-      entries=root.ChatImport.inspectZip(bytes);
+      bytes=new Uint8Array(await BaseImport.readFileBuffer(file));
+      entries=BaseImport.inspectZip(bytes);
 
       const telegramEntry=entries.find(entry=>/(^|\/)result\.json$/i.test(entry.name));
-      if(telegramEntry&&telegramEntry.size<=root.ChatImport.LIMITS.chatBytes){
-        const json=safeJson(decode(await root.ChatImport.extractZipEntry(bytes,telegramEntry)));
+      if(telegramEntry&&telegramEntry.size<=BaseImport.LIMITS.chatBytes){
+        const json=safeJson(decode(await BaseImport.extractZipEntry(bytes,telegramEntry)));
         choices.push(...telegramChoices(json));
       }
 
-      const metaEntries=entries.filter(entry=>/(^|\/)messages\/(inbox|archived_threads|filtered_threads)\/.+\/message_\d+\.json$/i.test(entry.name)&&entry.size<=root.ChatImport.LIMITS.chatBytes);
+      const metaEntries=entries.filter(entry=>/(^|\/)messages\/(inbox|archived_threads|filtered_threads)\/.+\/message_\d+\.json$/i.test(entry.name)&&entry.size<=BaseImport.LIMITS.chatBytes);
       if(metaEntries.length){
         const grouped=new Map();
         for(const entry of metaEntries){
-          const json=safeJson(decode(await root.ChatImport.extractZipEntry(bytes,entry)));
+          const json=safeJson(decode(await BaseImport.extractZipEntry(bytes,entry)));
           if(!isMetaMessageJson(entry.name,json))continue;
           const path=entry.name.replace(/\/message_\d+\.json$/i,'');
           if(!grouped.has(path))grouped.set(path,[]);
@@ -210,9 +212,9 @@
       }
     }else{
       const file=jsonFiles[0];
-      if(file.size>root.ChatImport.LIMITS.chatBytes)fail('CHAT_TOO_LARGE','This JSON export exceeds 20 MB. Export a smaller conversation.');
+      if(file.size>BaseImport.LIMITS.chatBytes)fail('CHAT_TOO_LARGE','This JSON export exceeds 20 MB. Export a smaller conversation.');
       fileName=file.name;
-      const json=safeJson(decode(new Uint8Array(await root.ChatImport.readFileBuffer(file))));
+      const json=safeJson(decode(new Uint8Array(await BaseImport.readFileBuffer(file))));
       choices=choicesFromDirect(json);
     }
     if(!choices.length)return null;
