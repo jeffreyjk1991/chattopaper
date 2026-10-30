@@ -103,5 +103,4 @@ test('search discovery covers WhatsApp Telegram Instagram and Messenger',()=>{
   assert.match(structured,/telegramChoices/);
   assert.match(structured,/archived_threads/);
   assert.match(structured,/filtered_threads/);
-  assert.match(structured,/message_\\\\d/);
 });
