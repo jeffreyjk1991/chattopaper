@@ -75,11 +75,16 @@
   <div class="steps" aria-label="Conversion steps"><span class="step current"><b>1</b> Upload</span><span class="step-line"></span><span class="step" id="step-customize"><b>2</b> Preview</span><span class="step-line"></span><span class="step" id="step-download"><b>3</b> Download</span></div>
   <div class="workspace">
    <aside class="controls" aria-label="PDF settings">
-    <label id="dropzone" class="dropzone"><span class="upload-glyph whatsapp-upload-glyph"><svg class="icon"><use href="#i-chat"/></svg></span><h3>Choose your WhatsApp export</h3><p>ZIP, or TXT + photos</p><input id="file-input" class="native-file-input primary-native-input" type="file" multiple accept=".zip,.txt,.jpg,.jpeg,.png,.webp,.gif,.avif,application/zip,application/x-zip-compressed,text/plain,image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Choose WhatsApp exported ZIP or text and photos" aria-describedby="upload-help"><small id="upload-help">ZIP with photos up to 300 MB, or TXT + images up to 100 MB</small></label>
-    <div id="imported-file" class="imported-file" hidden><span class="file-glyph"><svg class="icon"><use href="#i-file"/></svg></span><div><strong id="file-name">Your conversation</strong><small id="file-meta"></small></div><label class="icon-button native-picker" id="replace-file" title="Replace conversation"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg><input id="replace-file-input" class="native-file-input" type="file" multiple accept=".zip,.txt,.jpg,.jpeg,.png,.webp,.gif,.avif,application/zip,application/x-zip-compressed,text/plain,image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Replace conversation"></label><button class="icon-button" id="clear-file" aria-label="Clear conversation" title="Clear conversation"><svg class="icon"><use href="#i-x"/></svg></button></div>
+    <label id="dropzone" class="dropzone"><span class="upload-glyph whatsapp-upload-glyph"><svg class="icon"><use href="#i-chat"/></svg></span><h3>Choose your chat export</h3><p>WhatsApp, Telegram, Instagram or Messenger</p><input id="file-input" class="native-file-input primary-native-input" type="file" multiple accept=".zip,.txt,.json,.jpg,.jpeg,.png,.webp,.gif,.avif,application/zip,application/x-zip-compressed,text/plain,application/json,image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Choose exported chat ZIP, JSON, text and photos" aria-describedby="upload-help"><small id="upload-help">ZIP up to 300 MB, or TXT / JSON + images up to 100 MB</small></label>
+    <div id="imported-file" class="imported-file" hidden><span class="file-glyph"><svg class="icon"><use href="#i-file"/></svg></span><div><strong id="file-name">Your conversation</strong><small id="file-meta"></small></div><label class="icon-button native-picker" id="replace-file" title="Replace conversation"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg><input id="replace-file-input" class="native-file-input" type="file" multiple accept=".zip,.txt,.json,.jpg,.jpeg,.png,.webp,.gif,.avif,application/zip,application/x-zip-compressed,text/plain,application/json,image/jpeg,image/png,image/webp,image/gif,image/avif" aria-label="Replace exported conversation"></label><button class="icon-button" id="clear-file" aria-label="Clear conversation" title="Clear conversation"><svg class="icon"><use href="#i-x"/></svg></button></div>
     <button class="sample-prompt" data-action="sample">Not ready? <strong>Try a sample</strong></button>
     <div class="import-status" id="import-status" role="status" aria-live="polite"></div>
     <div id="import-error" class="notice error" role="alert" hidden></div>
+    <div id="conversation-choice" class="conversation-choice" hidden>
+      <label for="conversation-select">Choose a conversation</label>
+      <select id="conversation-select"></select>
+      <button class="button light small" id="conversation-open" type="button">Open conversation</button>
+    </div>
     <div id="import-warnings" class="notice warning" hidden></div>
     <details class="customize-panel"><summary>Customize PDF <span>Optional</span></summary><div class="controls-content" id="controls-content">
      <div class="field"><label for="document-title">Give it a title <span>Optional</span></label><input id="document-title" maxlength="100" placeholder="A conversation worth keeping" value="Our little adventures"></div>
@@ -137,6 +142,7 @@
 <script>/*__PDF_LIB__*/</script>
 <script>/*__ZIP_LIB__*/</script>
 <script>/*__IMPORTER__*/</script>
+<script>/*__STRUCTURED_IMPORTER__*/</script>
 <script>/*__DOCUMENT__*/</script>
 <script>window.CHATTOPAPER_SAMPLE_IMAGE = "__COAST_IMAGE__"; window.CHATTOPAPER_STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_14A14obls5UlaIpgY4gIo00"; window.CHATTOPAPER_STRIPE_TEST_MODE = true; window.CHATTOPAPER_FREE_LAUNCH = __FREE_LAUNCH__;</script>
 <script>/*__APP__*/</script>
