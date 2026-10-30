@@ -149,3 +149,63 @@ test('SMS Backup & Restore XML is grouped into selectable conversations', async 
   assert.equal(chosen.parsed.messages[0].text,'Hello & welcome');
   assert.equal(chosen.parsed.messages[1].sender,'You');
 });
+
+
+test('Messenger multi-part thread merges message_N JSON files in chronological order', async () => {
+  const part1=JSON.stringify({title:'Customer',participants:[{name:'Alex'},{name:'Customer'}],messages:[
+    {sender_name:'Customer',timestamp_ms:1793181720000,content:'Newest message'}
+  ]});
+  const part2=JSON.stringify({title:'Customer',participants:[{name:'Alex'},{name:'Customer'}],messages:[
+    {sender_name:'Alex',timestamp_ms:1793181600000,content:'Oldest message'}
+  ]});
+  const archive=zip([
+    {name:'messages/inbox/customer/message_1.json',content:part1},
+    {name:'messages/inbox/customer/message_2.json',content:part2}
+  ]);
+  const source=await Structured.readFiles([file('facebook-messages.zip',archive)]);
+  assert.equal(source.platform,'meta');
+  assert.equal(source.parsed.stats.userMessages,2);
+  assert.equal(source.parsed.messages[0].text,'Oldest message');
+  assert.equal(source.parsed.messages[1].text,'Newest message');
+});
+
+test('direct Meta message JSON is not misclassified as Telegram', async () => {
+  const json=JSON.stringify({
+    title:'Direct Meta',
+    participants:[{name:'Alex'},{name:'Jamie'}],
+    messages:[
+      {sender_name:'Jamie',timestamp_ms:1793181660000,content:'Meta reply'},
+      {sender_name:'Alex',timestamp_ms:1793181600000,content:'Meta hello'}
+    ]
+  });
+  const source=await Structured.readFiles([file('message_1.json',json)]);
+  assert.equal(source.platform,'meta');
+  assert.equal(source.parsed.messages[0].text,'Meta hello');
+});
+
+test('Telegram unsupported attachment remains an explicit placeholder', async () => {
+  const json=JSON.stringify({
+    name:'Files',
+    messages:[{id:1,type:'message',date:'2026-10-28T09:15:00',from:'Alex',text:'Document attached',file:'files/report.pdf'}]
+  });
+  const source=await Structured.readFiles([file('result.json',json)]);
+  assert.equal(source.parsed.stats.unsupportedMedia,1);
+  assert.equal(source.parsed.messages[0].attachment.kind,'unsupported');
+  assert.match(source.parsed.messages[0].attachment.label,/report\.pdf/i);
+});
+
+test('SMS XML decodes numeric and named XML entities', async () => {
+  const xml='<?xml version="1.0"?><smses count="1"><sms address="+15550001" date="1793376000000" type="1" body="Tom &amp; Jerry &#x1F600; &quot;ok&quot;" contact_name="Jamie"/></smses>';
+  const source=await SmsImport.readFiles([file('sms.xml',xml)]);
+  assert.equal(source.parsed.messages[0].text,'Tom & Jerry 😀 "ok"');
+});
+
+test('unrelated XML is rejected instead of pretending to be SMS', async () => {
+  const xml='<?xml version="1.0"?><contacts><contact name="Jamie"/></contacts>';
+  assert.equal(await SmsImport.readFiles([file('contacts.xml',xml)]),null);
+});
+
+test('random SQLite database is rejected instead of pretending to be Apple Messages', async () => {
+  const fake=Buffer.alloc(4096);Buffer.from('SQLite format 3\0').copy(fake,0);fake.writeUInt16BE(4096,16);
+  assert.equal(await AppleMessages.readFiles([file('other.db',fake)]),null);
+});
