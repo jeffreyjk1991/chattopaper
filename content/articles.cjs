@@ -32,7 +32,7 @@ const clusters = [
   {
     category: 'Android',
     items: [
-      ['How to Export a WhatsApp Chat on Android', 'export-whatsapp-chat-android', 'Open the chat, choose More options, then More, then Export chat. Pick Include media when you need photos in the final document, and save the resulting export somewhere accessible.', 'export whatsapp chat android'],
+      ['How to Export a WhatsApp Chat on Android & Save as PDF', 'export-whatsapp-chat-android', 'Export a WhatsApp conversation on Android, include media when photos matter, then turn the TXT or ZIP into a clean PDF. ChatToPaper works in the browser, requires no account, and does not upload your chat files.', 'export whatsapp chat android pdf'],
       ['How to Print a WhatsApp Conversation From Android', 'print-whatsapp-conversation-android', 'Export the conversation, convert it to PDF, and print the PDF from Android or a computer. This gives you proper page breaks instead of dozens of individual screenshots.', 'print whatsapp chat android'],
       ['How to Save WhatsApp Messages as PDF on Android', 'save-whatsapp-messages-pdf-android', 'Exporting and converting is more dependable than printing from the chat screen. The exported transcript carries the message sequence and timestamps used to build the PDF.', 'save whatsapp messages pdf android'],
       ['WhatsApp Android Export With Media: Step by Step', 'whatsapp-android-export-with-media', 'Choose Include media during export, save the generated ZIP or shared files, then convert that export as a single conversation. Check the photo count before creating the final PDF.', 'whatsapp android export media'],
