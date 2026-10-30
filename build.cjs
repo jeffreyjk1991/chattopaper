@@ -12,6 +12,8 @@ const data = (file, type) => `data:${type};base64,${fs.readFileSync(path.join(ro
 const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const escXml = escapeHtml;
 const articles = require('./content/articles.cjs');
+const renderPlatformSeo = require('./content/platform-seo-renderer.cjs');
+const {guides: platformSeoGuides} = require('./content/platform-seo-guides.cjs');
 const blogCss = read('src/blog.css');
 const analytics = `<script>(function(){try{var k='chattopaper.attribution.v1';if(!sessionStorage.getItem(k)){var p=new URLSearchParams(location.search),r='';try{r=document.referrer?new URL(document.referrer).hostname.replace(/^www\\./,''):''}catch(e){}sessionStorage.setItem(k,JSON.stringify({referrerHost:r,utmSource:p.get('utm_source')||'',utmMedium:p.get('utm_medium')||'',utmCampaign:p.get('utm_campaign')||'',utmContent:p.get('utm_content')||'',utmTerm:p.get('utm_term')||'',landingPage:location.pathname}));}}catch(e){}})();window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments)};</script><script defer src="/_vercel/insights/script.js"></script><script defer src="/_vercel/speed-insights/script.js"></script>`;
 const favicon = `${SITE}/favicon.png`;
@@ -209,9 +211,11 @@ for(const guide of platformGuides){
   write(`blog/${guide.slug}/index.html`,layout({title:`${guide.title} | ChatToPaper`,description:guide.description,canonical,jsonLd,main:guide.body,type:'article'}));
 }
 
+const renderedPlatformSeo=renderPlatformSeo({SITE,layout,write,escapeHtml,platformGuides});
+
 // Blog index and category hubs.
 const cats=[...new Set(articles.map(a=>a.category))];
-const catNav=cats.map(c=>`<a href="/blog/category/${slugifyCategory(c)}/">${escapeHtml(c)}</a>`).join('');
+const catNav=renderedPlatformSeo.hubLinks.map(p=>`<a href="${p.href}">${escapeHtml(p.name)}</a>`).join('')+cats.map(c=>`<a href="/blog/category/${slugifyCategory(c)}/">${escapeHtml(c)}</a>`).join('');
 const featured=articles.filter(a=>a.sections);
 const startHere=`<section class="start-here" aria-labelledby="start-here-title"><div class="eyebrow">FREE TOOL</div><h2>Check your WhatsApp export</h2><p>Before converting, quickly check message count, date range, missing photos and “Media omitted” warnings. Everything is analyzed locally in your browser.</p><p><a class="btn" href="/tools/whatsapp-export-checker/">Open the WhatsApp Export Checker →</a></p><h2 id="start-here-title">Start with a guide</h2><div class="related">${featured.map(a=>`<a href="/blog/${a.slug}/">${escapeHtml(a.title)}</a>`).join('')}</div></section>`;
 const platformCards=platformGuides.map(g=>`<article class="card"><small>Other chat apps</small><h2>${escapeHtml(g.title)}</h2><p>${escapeHtml(g.description)}</p><a href="/blog/${g.slug}/">Read guide →</a></article>`).join('');
@@ -219,18 +223,18 @@ const cards=platformCards+articles.map(a=>`<article class="card"><small>${escape
 const guideWalkthrough=`<section class="guide-walkthrough" aria-labelledby="how-it-works-title">
   <div class="walkthrough-copy">
     <div class="eyebrow">HOW CHATTOPAPER WORKS</div>
-    <h2 id="how-it-works-title">From WhatsApp export to PDF in three steps.</h2>
-    <p>Export your chat from WhatsApp, make any quick adjustments, then save a clean PDF. Your selected chat files stay in your browser.</p>
+    <h2 id="how-it-works-title">From chat export to PDF in three steps.</h2>
+    <p>Export a supported conversation, make any quick adjustments, then save a clean PDF. Your selected chat files stay in your browser.</p>
   </div>
-  <div class="walkthrough-steps" aria-label="Three steps to create a WhatsApp PDF">
+  <div class="walkthrough-steps" aria-label="Three steps to create a chat PDF">
     <article class="walkthrough-step step-upload">
       <span class="walkthrough-number">1</span>
       <div class="walkthrough-demo upload-demo" aria-hidden="true">
-        <div class="demo-file">ZIP</div>
-        <div class="demo-drop"><span>↑</span><small>WhatsApp export</small></div>
+        <div class="demo-file">FILE</div>
+        <div class="demo-drop"><span>↑</span><small>Chat export</small></div>
       </div>
-      <h2>Upload your ZIP</h2>
-      <p>Choose the ZIP exported from WhatsApp, or the TXT plus photos.</p>
+      <h2>Upload your export</h2>
+      <p>Choose the supported ZIP, JSON, TXT, XML or Apple Messages database.</p>
     </article>
     <article class="walkthrough-step step-adjust">
       <span class="walkthrough-number">2</span>
@@ -255,8 +259,9 @@ const guideWalkthrough=`<section class="guide-walkthrough" aria-labelledby="how-
   <p class="walkthrough-action"><a class="btn" href="/#converter">Create your PDF →</a></p>
 </section>`;
 
-const blogJson=`<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage',name:'ChatToPaper Chat Export PDF Guides',url:`${SITE}/blog/`,description:'42 focused guides about exporting, printing and preserving WhatsApp conversations, including small-business record keeping.'}).replace(/</g,'\\u003c')}</script>`;
-write('blog/index.html',layout({title:'Chat Export PDF Guides — Export, Print & Preserve Chats | ChatToPaper',description:'42 focused guides for converting WhatsApp chats to PDF, small-business record keeping, printing conversations with photos, exporting on iPhone and Android, troubleshooting, privacy and archiving.',canonical:`${SITE}/blog/`,jsonLd:blogJson,main:`<main class="wrap">${guideWalkthrough}<section class="hero guide-library-hero"><div class="eyebrow">42 FOCUSED GUIDES</div><h1>Chats,<br>made easier to keep.</h1><p>Answer-first guides for exporting, converting, printing and preserving conversations from WhatsApp and other supported chat apps. Choose a task below, or browse by topic to solve a specific export or printing problem.</p><div class="category-nav">${catNav}</div></section>${startHere}<section class="grid">${cards}</section></main>`}));
+const guideCount=articles.length+platformGuides.length+platformSeoGuides.length;
+const blogJson=`<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage',name:'ChatToPaper Chat Export PDF Guides',url:`${SITE}/blog/`,description:`${guideCount} focused guides across WhatsApp, Telegram, Instagram, Messenger, iMessage and SMS.`}).replace(/</g,'\\u003c')}</script>`;
+write('blog/index.html',layout({title:'Chat Export PDF Guides — WhatsApp, Telegram, Instagram, Messenger, iMessage & SMS | ChatToPaper',description:`${guideCount} practical guides for converting, printing, archiving and troubleshooting supported chat platforms.`,canonical:`${SITE}/blog/`,jsonLd:blogJson,main:`<main class="wrap">${guideWalkthrough}<section class="hero guide-library-hero"><div class="eyebrow">${guideCount} FOCUSED GUIDES</div><h1>Chats,<br>made easier to keep.</h1><p>Answer-first guides for exporting, converting, printing and preserving conversations across every platform ChatToPaper supports. Browse by platform or by task.</p><div class="category-nav">${catNav}</div></section>${startHere}<section class="grid">${cards}</section></main>`}));
 for(const cat of cats){
   const subset=articles.filter(a=>a.category===cat);
   const catCards=subset.map(a=>`<article class="card"><small>${escapeHtml(a.category)}</small><h2>${escapeHtml(a.title)}</h2><p>${escapeHtml(a.answer)}</p><a href="/blog/${a.slug}/">Read guide →</a></article>`).join('');
