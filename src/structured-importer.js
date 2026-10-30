@@ -148,9 +148,9 @@
     return metaConversation(raw,id,raw.title,path);
   }
   function choicesFromDirect(json){
+    if(json&&Array.isArray(json.messages)&&Array.isArray(json.participants))return [metaConversation(json,'direct',json.title,json.thread_path)];
     const telegram=telegramChoices(json);
     if(telegram.length)return telegram;
-    if(json&&Array.isArray(json.messages)&&Array.isArray(json.participants))return [metaConversation(json,'direct',json.title,json.thread_path)];
     return [];
   }
   async function extractMedia(bytes,entries,selected,options){
