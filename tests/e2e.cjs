@@ -33,6 +33,55 @@ function makeZip(entries){
   end.writeUInt32LE(0x06054b50,0); end.writeUInt16LE(entries.length,8); end.writeUInt16LE(entries.length,10); end.writeUInt32LE(dir.length,12); end.writeUInt32LE(offset,16);
   return Buffer.concat([...local,dir,end]);
 }
+
+const JPEG=Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAACAAIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6pooooA//2Q==','base64');
+const fixtureSource=fs.readFileSync(path.join(__dirname,'importer-regression.test.cjs'),'utf8');
+const appleMatch=fixtureSource.match(/const APPLE_DB_FIXTURE = gunzipSync\(Buffer\.from\('([^']+)'/);
+assert.ok(appleMatch,'Apple Messages DB fixture missing');
+const APPLE_DB=zlib.gunzipSync(Buffer.from(appleMatch[1],'base64'));
+
+async function assertPdfDownload(page,expectedTitle){
+  await page.waitForFunction(()=>!document.querySelector('#download-open')?.disabled,null,{timeout:20000});
+  const downloadPromise=page.waitForEvent('download',{timeout:30000});
+  await page.locator('#download-open').click();
+  const download=await downloadPromise;
+  const saved=await download.path();
+  assert.ok(saved,'browser download path missing');
+  const bytes=fs.readFileSync(saved);
+  assert.equal(bytes.subarray(0,5).toString('ascii'),'%PDF-');
+  assert.ok(bytes.length>1000,'downloaded PDF unexpectedly small');
+  const pdf=await PDFDocument.load(bytes,{updateMetadata:false});
+  assert.equal(pdf.getCreator(),'ChatToPaper');
+  assert.equal(pdf.getProducer(),'ChatToPaper — processed locally');
+  assert.ok(pdf.getPageCount()>=1);
+  if(expectedTitle)assert.equal(pdf.getTitle(),expectedTitle);
+}
+
+async function runPlatformCase(context,base,fixture){
+  const page=await context.newPage();
+  const errors=[]; page.on('pageerror',e=>errors.push(String(e)));
+  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+  await page.locator('#document-title').fill(fixture.pdfTitle);
+  await page.locator('#file-input').setInputFiles(fixture.files);
+  if(fixture.choiceTitle){
+    await page.waitForFunction(()=>!document.querySelector('#conversation-choice')?.hidden,null,{timeout:15000});
+    const option=page.locator('#conversation-select option').filter({hasText:fixture.choiceTitle});
+    assert.equal(await option.count(),1,'expected conversation choice missing: '+fixture.choiceTitle);
+    await page.locator('#conversation-select').selectOption(await option.getAttribute('value'));
+    await page.locator('#conversation-open').click();
+  }
+  await waitText(page,'#message-count',String(fixture.messages));
+  await page.waitForFunction(()=>Number(document.querySelector('#page-count')?.textContent)>0,null,{timeout:20000});
+  assert.match(await page.locator('#file-meta').innerText(),fixture.platformLabel);
+  const transcript=await page.locator('#preview-transcript').innerText();
+  for(const expected of fixture.texts)assert.ok(transcript.includes(expected),'preview missing '+expected);
+  if(fixture.photos!==undefined)await waitText(page,'#photo-count',String(fixture.photos));
+  await assertPdfDownload(page,fixture.pdfTitle);
+  await page.waitForURL(base+'/',{timeout:10000});
+  assert.deepEqual(errors,[],'page errors for '+fixture.name+': '+errors.join('; '));
+  await page.close();
+}
+
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.xml':'application/xml','.txt':'text/plain; charset=utf-8','.webmanifest':'application/manifest+json'};
 function server(){
   return http.createServer((req,res)=>{
@@ -92,6 +141,64 @@ async function main(){
     assert.equal(await page.locator('#download-dialog').isVisible(),false,'free launch unexpectedly showed the old confirmation popup');
     assert.deepEqual(pageErrors,[],'desktop page errors: '+pageErrors.join('; '));
 
+
+    // Every supported non-WhatsApp format must complete browser -> preview -> PDF.
+    const telegramFull=JSON.stringify({chats:{list:[
+      {id:10,name:'Other Telegram Chat',messages:[{id:1,type:'message',date:'2026-10-28T09:00:00',from:'Other',text:'Skip me'}]},
+      {id:20,name:'Telegram QA',messages:[
+        {id:2,type:'message',date:'2026-10-28T10:15:00',from:'Alex',text:'Telegram hello',photo:'photos/tg.jpg'},
+        {id:3,type:'message',date:'2026-10-28T10:16:00',from:'Jamie',text:'Telegram reply'}
+      ]}
+    ]}});
+    const telegramZip=makeZip([{name:'result.json',content:telegramFull},{name:'photos/tg.jpg',content:JPEG}]);
+
+    const instagramThread=JSON.stringify({title:'Instagram QA',participants:[{name:'Alex'},{name:'Jamie'}],messages:[
+      {sender_name:'Jamie',timestamp_ms:1793181660000,content:'Instagram reply'},
+      {sender_name:'Alex',timestamp_ms:1793181600000,content:'Instagram hello',photos:[{uri:'your_instagram_activity/messages/inbox/instagram_qa/photos/ig.jpg'}]}
+    ]});
+    const instagramZip=makeZip([
+      {name:'your_instagram_activity/messages/inbox/instagram_qa/message_1.json',content:instagramThread},
+      {name:'your_instagram_activity/messages/inbox/instagram_qa/photos/ig.jpg',content:JPEG}
+    ]);
+
+    const messengerA=JSON.stringify({title:'Other Messenger',participants:[{name:'A'},{name:'B'}],messages:[
+      {sender_name:'B',timestamp_ms:1793181660000,content:'Other thread'},
+      {sender_name:'A',timestamp_ms:1793181600000,content:'Not selected'}
+    ]});
+    const messengerB=JSON.stringify({title:'Messenger QA',participants:[{name:'Alex'},{name:'Jamie'}],messages:[
+      {sender_name:'Jamie',timestamp_ms:1793181720000,content:'Messenger second'},
+      {sender_name:'Alex',timestamp_ms:1793181660000,content:'Messenger first'}
+    ]});
+    const messengerZip=makeZip([
+      {name:'messages/inbox/other/message_1.json',content:messengerA},
+      {name:'messages/inbox/messenger_qa/message_1.json',content:messengerB}
+    ]);
+
+    const smsXml='<?xml version="1.0"?><smses count="3"><sms address="+15550001" date="1793376000000" type="1" body="SMS hello" contact_name="Jamie"/><sms address="+15550001" date="1793376060000" type="2" body="SMS reply" contact_name="Jamie"/><sms address="+15550002" date="1793376120000" type="1" body="Other SMS" contact_name="Taylor"/></smses>';
+
+    const platformContext=await browser.newContext({acceptDownloads:true,viewport:{width:1280,height:900}});
+    await runPlatformCase(platformContext,base,{
+      name:'Telegram',platformLabel:/Telegram/,pdfTitle:'Telegram QA PDF',messages:2,photos:1,texts:['Telegram hello','Telegram reply'],choiceTitle:'Telegram QA',
+      files:{name:'telegram-export.zip',mimeType:'application/zip',buffer:telegramZip}
+    });
+    await runPlatformCase(platformContext,base,{
+      name:'Instagram',platformLabel:/Instagram \/ Messenger/,pdfTitle:'Instagram QA PDF',messages:2,photos:1,texts:['Instagram hello','Instagram reply'],
+      files:{name:'instagram-export.zip',mimeType:'application/zip',buffer:instagramZip}
+    });
+    await runPlatformCase(platformContext,base,{
+      name:'Messenger',platformLabel:/Instagram \/ Messenger/,pdfTitle:'Messenger QA PDF',messages:2,photos:0,texts:['Messenger first','Messenger second'],choiceTitle:'Messenger QA',
+      files:{name:'facebook-export.zip',mimeType:'application/zip',buffer:messengerZip}
+    });
+    await runPlatformCase(platformContext,base,{
+      name:'iMessage',platformLabel:/iMessage/,pdfTitle:'iMessage QA PDF',messages:2,photos:0,texts:['Hello from Jamie'],
+      files:{name:'chat.db',mimeType:'application/octet-stream',buffer:APPLE_DB}
+    });
+    await runPlatformCase(platformContext,base,{
+      name:'SMS',platformLabel:/SMS/,pdfTitle:'SMS QA PDF',messages:2,photos:0,texts:['SMS hello','SMS reply'],choiceTitle:'Jamie',
+      files:{name:'sms-backup.xml',mimeType:'application/xml',buffer:Buffer.from(smsXml)}
+    });
+    await platformContext.close();
+
     await page.locator('#file-input').setInputFiles({name:'broken.zip',mimeType:'application/zip',buffer:Buffer.from('broken zip')});
     await page.waitForFunction(()=>!document.querySelector('#import-error')?.hidden && document.querySelector('#import-error')?.textContent.trim().length>0,null,{timeout:10000});
     assert.match(await page.locator('#import-error').innerText(),/zip|archive/i);
@@ -120,7 +227,7 @@ async function main(){
     assert.match(llms,/ChatToPaper/);
     assert.doesNotMatch(llms,new RegExp('Chatto'+'Paper'));
 
-    console.log('E2E PASS: desktop ZIP -> preview -> free PDF, recovery, mobile TXT, branding, SEO assets.');
+    console.log('E2E PASS: WhatsApp, Telegram, Instagram, Messenger, iMessage and SMS -> preview -> real PDF download; recovery, mobile, branding and SEO assets.');
   } finally {
     await browser.close().catch(()=>{});
     await new Promise(resolve=>srv.close(resolve));
