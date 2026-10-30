@@ -83,3 +83,20 @@ test('export checker is crawlable and included in discovery files',()=>{
   assert.match(build,/tools\/whatsapp-export-checker/);
   assert.match(build,/export_checker_completed/);
 });
+
+
+test('search snippets emphasize chat-to-PDF, privacy and Android intent',()=>{
+  const home=fs.readFileSync('src/index.html','utf8');
+  const articles=fs.readFileSync('content/articles.cjs','utf8');
+  const detailed=fs.readFileSync('content/detailed-guides.cjs','utf8');
+  const build=fs.readFileSync('build.cjs','utf8');
+  assert.match(home,/<title>Free WhatsApp Chat to PDF Converter \| Private, No Upload<\/title>/);
+  assert.match(home,/no account or app install/i);
+  assert.match(home,/your chat is not uploaded/i);
+  assert.match(articles,/How to Export a WhatsApp Chat on Android & Save as PDF/);
+  assert.match(articles,/export whatsapp chat android pdf/);
+  assert.match(detailed,/modern Android browser/);
+  assert.match(detailed,/A4 is common in many countries/);
+  assert.match(build,/Android: export a WhatsApp chat and save it as PDF/);
+  assert.match(build,/no ChatToPaper account or app install/);
+});
