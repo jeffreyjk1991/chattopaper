@@ -7,7 +7,7 @@
     active: false, sample: true, doc: null, page: 0, revision: 0, importRevision: 0,
     dirty: false, importing: false, rendering: false, exporting: false,
     dateConfirmed: true, timer: null, toastTimer: null, downloadURL: null,
-    previewRevision: 0, sampleSource: null, uiWarnings: [], paymentUnlocked: false, paymentRef: null, paymentSessionId: null, downloadName: null
+    previewRevision: 0, sampleSource: null, uiWarnings: [], pendingImportFiles: null, pendingChoices: [], paymentUnlocked: false, paymentRef: null, paymentSessionId: null, downloadName: null
   };
   const formatNumber = n => new Intl.NumberFormat('en').format(n || 0);
   const stripePaymentLink = window.CHATTOPAPER_STRIPE_PAYMENT_LINK || '';
@@ -20,6 +20,7 @@
   const shortDate = key => key ? new Intl.DateTimeFormat('en', {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}).format(new Date(key+'T12:00:00Z')) : 'Unknown date';
   const icon = name => { const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','icon'); const use=document.createElementNS('http://www.w3.org/2000/svg','use'); use.setAttribute('href','#i-'+name);svg.append(use);return svg; };
   const txt = (tag, value, className) => {const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
+  const platformLabel = value => ({whatsapp:'WhatsApp',telegram:'Telegram',meta:'Instagram / Messenger'})[value]||'Chat';
   function track(name, data={}) { try { if(typeof window.va==='function') window.va('event', {name, data}); } catch(_){} }
   function conversionAttribution() {
     let stored={};
@@ -123,7 +124,7 @@
     return {text,fileName:'Emma & Alex · sample chat',chatFileName:'Emma & Alex.txt',media:new Map([[name,{name,blob:dataImageBlob(window.CHATTOPAPER_SAMPLE_IMAGE),type:'image/jpeg',previewURL:window.CHATTOPAPER_SAMPLE_IMAGE}]]),warnings:[]};
   }
   function prepareSource(source, dateOrder) {
-    const parsed=ChatImport.parse(source.text,{dateOrder});
+    const parsed=source.parsed||ChatImport.parse(source.text,{dateOrder});
     const linked=ChatImport.linkMedia(parsed.messages,source.media);
     return {parsed,linked};
   }
@@ -162,8 +163,8 @@
     }
     if(reset){$('date-from').value=state.active?first:'';$('date-to').value=state.active?last:'';}
     $('date-description').textContent=state.active&&first ? `${shortDate(first)} – ${shortDate(last)} · dates are inclusive` : 'Your chat’s date range will appear here.';
-    $('date-order-field').hidden=!state.active||state.sample;
-    $('date-order-description').textContent=`Interpreted as ${state.parsed?.dateOrder==='DMY'?'day / month / year':'month / day / year'}. Original clock times are kept.`;
+    $('date-order-field').hidden=!state.active||state.sample||state.source?.platform!=='whatsapp';
+    $('date-order-description').textContent=state.source?.platform==='whatsapp'?`Interpreted as ${state.parsed?.dateOrder==='DMY'?'day / month / year':'month / day / year'}. Original clock times are kept.`:'Dates are read from the exported conversation metadata.';
   }
   function updateParticipants() {
     const select=$('primary-sender');select.replaceChildren();
@@ -181,15 +182,15 @@
     state.source=source;state.parsed=prepared.parsed;state.linked=prepared.linked;
     state.mediaURLs=media.urls;state.messages=media.messages;state.active=active;state.sample=sample;state.page=0;
     state.dateConfirmed=!prepared.parsed.ambiguousDates;state.uiWarnings=[];
-    const fileTitle=(source.chatFileName||source.fileName).replace(/\.(txt|zip)$/i,'').replace(/^WhatsApp Chat (?:with |[-–] )/i,'');
+    const fileTitle=(source.conversationTitle||source.chatFileName||source.fileName).replace(/\.(txt|zip|json)$/i,'').replace(/^WhatsApp Chat (?:with |[-–] )/i,'');
     $('document-title').value=sample?'Our little adventures':(/^_?chat$/i.test(fileTitle)?prepared.parsed.participants.slice(0,3).join(' & '):fileTitle).slice(0,100)||'A conversation worth keeping';
     $('dropzone').hidden=active;$('imported-file').hidden=!active;
-    $('file-name').textContent=source.fileName;$('file-name').title=source.fileName;
-    $('file-meta').textContent=`${formatNumber(prepared.parsed.stats.userMessages)} messages · ${formatNumber(prepared.linked.matchedPhotos)} ${prepared.linked.matchedPhotos===1?'photo':'photos'} matched`;
+    $('file-name').textContent=source.conversationTitle||source.fileName;$('file-name').title=source.fileName;
+    $('file-meta').textContent=`${platformLabel(source.platform)} · ${formatNumber(prepared.parsed.stats.userMessages)} messages · ${formatNumber(prepared.linked.matchedPhotos)} ${prepared.linked.matchedPhotos===1?'photo':'photos'} matched`;
     document.querySelectorAll('.sample-prompt').forEach(el=>{el.hidden=active&&sample;});
     $('step-customize').classList.toggle('current',active);$('step-download').classList.remove('current');
-    $('preview-tag').textContent=sample?'Sample':'Your chat';
-    $('import-status').textContent=active?(sample?'Sample loaded. Make it yours, then try a download.':'Your conversation was read locally. Check the preview and dates below.') : '';
+    $('preview-tag').textContent=sample?'Sample':platformLabel(source.platform);
+    $('import-status').textContent=active?(sample?'Sample loaded. Make it yours, then try a download.':`${platformLabel(source.platform)} conversation read locally. Check the preview and dates below.`) : '';
     updateParticipants();updateDates(true);setError('');renderWarnings();scheduleRender(0);return true;
   }
   async function importFiles(files) {
