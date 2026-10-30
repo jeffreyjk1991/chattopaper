@@ -20,7 +20,7 @@
   const shortDate = key => key ? new Intl.DateTimeFormat('en', {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}).format(new Date(key+'T12:00:00Z')) : 'Unknown date';
   const icon = name => { const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','icon'); const use=document.createElementNS('http://www.w3.org/2000/svg','use'); use.setAttribute('href','#i-'+name);svg.append(use);return svg; };
   const txt = (tag, value, className) => {const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
-  const platformLabel = value => ({whatsapp:'WhatsApp',telegram:'Telegram',meta:'Instagram / Messenger'})[value]||'Chat';
+  const platformLabel = value => ({whatsapp:'WhatsApp',telegram:'Telegram',meta:'Instagram / Messenger',imessage:'iMessage',sms:'SMS'})[value]||'Chat';
   function track(name, data={}) { try { if(typeof window.va==='function') window.va('event', {name, data}); } catch(_){} }
   function conversionAttribution() {
     let stored={};
@@ -208,12 +208,19 @@
     $('conversation-choice').hidden=false;
     $('import-status').textContent=choices.length+' conversations found. Choose the one you want to turn into a PDF.';
   }
+  async function readSupportedSource(files,options={}){
+    let source=null;
+    if(window.ChatAppleMessages){source=await ChatAppleMessages.readFiles(files,options);if(source)return source;}
+    if(window.ChatSmsImport){source=await ChatSmsImport.readFiles(files,options);if(source)return source;}
+    if(window.ChatStructuredImport){source=await ChatStructuredImport.readFiles(files,options);if(source)return source;}
+    return null;
+  }
   async function openChosenConversation(){
     if(!state.pendingImportFiles?.length)return;
     const token=++state.importRevision;state.importing=true;updatePickerState();updateDownloadEnabled();setError('');
     try{
-      const source=await ChatStructuredImport.readFiles(state.pendingImportFiles,{conversationId:$('conversation-select').value,onProgress:({done,total})=>{
-        if(token===state.importRevision)$('import-status').textContent='Reading photos locally: '+done+' of '+total+'…';
+      const source=await readSupportedSource(state.pendingImportFiles,{conversationId:$('conversation-select').value,onProgress:({done,total})=>{
+        if(token===state.importRevision)$('import-status').textContent='Reading files locally: '+done+' of '+total+'…';
       }});
       if(!source||source.needsConversation)throw new Error('That conversation could not be opened from this export.');
       if(token!==state.importRevision)return;
@@ -229,16 +236,13 @@
   async function importFiles(files) {
     if(!files.length)return;
     hideConversationChoice();
-    track('file_selected',{files:files.length,zip:files.some(file=>/\.zip$/i.test(file.name)),json:files.some(file=>/\.json$/i.test(file.name))});
+    track('file_selected',{files:files.length,zip:files.some(file=>/\.zip$/i.test(file.name)),json:files.some(file=>/\.json$/i.test(file.name)),xml:files.some(file=>/\.xml$/i.test(file.name)),db:files.some(file=>/\.db$/i.test(file.name))});
     const token=++state.importRevision;state.importing=true;updatePickerState();updateDownloadEnabled();setError('');
     $('import-status').textContent='Reading your export on this device…';
     try {
-      let source=null;
-      if(window.ChatStructuredImport){
-        source=await ChatStructuredImport.readFiles(files,{onProgress:({done,total})=>{
-          if(token===state.importRevision)$('import-status').textContent='Reading photos locally: '+done+' of '+total+'…';
-        }});
-      }
+      let source=await readSupportedSource(files,{onProgress:({done,total})=>{
+        if(token===state.importRevision)$('import-status').textContent='Reading files locally: '+done+' of '+total+'…';
+      }});
       if(source?.needsConversation){
         if(token!==state.importRevision)return;
         showConversationChoice(files,source.choices);
@@ -254,7 +258,7 @@
       const committed=await setSource(source,{active:true,sample:false,token});
       if(committed){track('chat_imported',{platform:source.platform});toast('Your conversation is ready to preview.');}
     } catch(error) {
-      if(token===state.importRevision){setError(error.message||'This export could not be read. Try the original WhatsApp, Telegram, Instagram or Messenger export.');$('import-status').textContent='';}
+      if(token===state.importRevision){setError(error.message||'This export could not be read. Try the original WhatsApp, Telegram, Instagram, Messenger, iMessage or SMS export.');$('import-status').textContent='';}
     } finally {
       if(token===state.importRevision){state.importing=false;updatePickerState();updateDownloadEnabled();}
     }
@@ -519,7 +523,7 @@
     // No synthetic .click(), hidden inputs, popup or activation delay is used.
     for(const id of ['file-input','replace-file-input']){
       $(id).addEventListener('change',async e=>{const input=e.currentTarget;const files=Array.from(input.files||[]);if(!files.length)return;try{await importFiles(files);}finally{input.value='';}});
-      $(id).addEventListener('cancel',()=>{if(!state.importing)$('import-status').textContent=state.active?'No new file selected. Your current conversation is unchanged.':'No file selected. Choose a supported chat ZIP, JSON, or WhatsApp TXT export.';});
+      $(id).addEventListener('cancel',()=>{if(!state.importing)$('import-status').textContent=state.active?'No new file selected. Your current conversation is unchanged.':'No file selected. Choose a supported chat ZIP, JSON, XML, Apple DB, or WhatsApp TXT export.';});
     }
     for(const type of ['dragenter','dragover'])$('dropzone').addEventListener(type,e=>{e.preventDefault();$('dropzone').classList.add('dragover');});
     for(const type of ['dragleave','drop'])$('dropzone').addEventListener(type,e=>{e.preventDefault();$('dropzone').classList.remove('dragover');});
