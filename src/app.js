@@ -193,20 +193,68 @@
     $('import-status').textContent=active?(sample?'Sample loaded. Make it yours, then try a download.':`${platformLabel(source.platform)} conversation read locally. Check the preview and dates below.`) : '';
     updateParticipants();updateDates(true);setError('');renderWarnings();scheduleRender(0);return true;
   }
+  function hideConversationChoice(){
+    state.pendingImportFiles=null;state.pendingChoices=[];
+    $('conversation-choice').hidden=true;$('conversation-select').replaceChildren();
+  }
+  function showConversationChoice(files,choices){
+    state.pendingImportFiles=files.slice();state.pendingChoices=choices.slice();
+    const select=$('conversation-select');select.replaceChildren();
+    for(const choice of choices){
+      const option=document.createElement('option');option.value=choice.id;
+      option.textContent=choice.title+' · '+formatNumber(choice.messageCount)+' messages';
+      select.append(option);
+    }
+    $('conversation-choice').hidden=false;
+    $('import-status').textContent=choices.length+' conversations found. Choose the one you want to turn into a PDF.';
+  }
+  async function openChosenConversation(){
+    if(!state.pendingImportFiles?.length)return;
+    const token=++state.importRevision;state.importing=true;updatePickerState();updateDownloadEnabled();setError('');
+    try{
+      const source=await ChatStructuredImport.readFiles(state.pendingImportFiles,{conversationId:$('conversation-select').value,onProgress:({done,total})=>{
+        if(token===state.importRevision)$('import-status').textContent='Reading photos locally: '+done+' of '+total+'…';
+      }});
+      if(!source||source.needsConversation)throw new Error('That conversation could not be opened from this export.');
+      if(token!==state.importRevision)return;
+      hideConversationChoice();
+      const committed=await setSource(source,{active:true,sample:false,token});
+      if(committed){track('chat_imported',{platform:source.platform});toast('Your conversation is ready to preview.');}
+    }catch(error){
+      if(token===state.importRevision){setError(error.message||'This conversation could not be read.');}
+    }finally{
+      if(token===state.importRevision){state.importing=false;updatePickerState();updateDownloadEnabled();}
+    }
+  }
   async function importFiles(files) {
     if(!files.length)return;
-    track('file_selected',{files:files.length,zip:files.some(file=>/\.zip$/i.test(file.name))});
+    hideConversationChoice();
+    track('file_selected',{files:files.length,zip:files.some(file=>/\.zip$/i.test(file.name)),json:files.some(file=>/\.json$/i.test(file.name))});
     const token=++state.importRevision;state.importing=true;updatePickerState();updateDownloadEnabled();setError('');
     $('import-status').textContent='Reading your export on this device…';
     try {
-      const source=await ChatImport.readFiles(files,{onProgress:({done,total})=>{
-        if(token===state.importRevision)$('import-status').textContent=`Reading photos locally: ${done} of ${total}…`;
-      }});
+      let source=null;
+      if(window.ChatStructuredImport){
+        source=await ChatStructuredImport.readFiles(files,{onProgress:({done,total})=>{
+          if(token===state.importRevision)$('import-status').textContent='Reading photos locally: '+done+' of '+total+'…';
+        }});
+      }
+      if(source?.needsConversation){
+        if(token!==state.importRevision)return;
+        showConversationChoice(files,source.choices);
+        return;
+      }
+      if(!source){
+        source=await ChatImport.readFiles(files,{onProgress:({done,total})=>{
+          if(token===state.importRevision)$('import-status').textContent='Reading photos locally: '+done+' of '+total+'…';
+        }});
+        source.platform='whatsapp';
+      }
       if(token!==state.importRevision)return;
       const committed=await setSource(source,{active:true,sample:false,token});
-      if(committed){track('chat_imported');toast('Your conversation is ready to preview.');}
+      if(committed){track('chat_imported',{platform:source.platform});toast('Your conversation is ready to preview.');}
     } catch(error) {
-      if(token===state.importRevision){setError(error.message||'This export could not be read. Please try the original WhatsApp export.');$('import-status').textContent='';}
+      if(token===state.importRevision){setError(error.message||'This export could not be read. Try the original WhatsApp, Telegram, Instagram or Messenger export.');$('import-status').textContent='';}
     } finally {
       if(token===state.importRevision){state.importing=false;updatePickerState();updateDownloadEnabled();}
     }
@@ -220,7 +268,7 @@
     }catch(error){setError('The sample could not be opened. You can still choose your own conversation. '+error.message);}
   }
   async function clearConversation() {
-    const token=++state.importRevision;state.importing=false;$('file-input').value='';$('replace-file-input').value='';updatePickerState();
+    const token=++state.importRevision;state.importing=false;hideConversationChoice();$('file-input').value='';$('replace-file-input').value='';updatePickerState();
     // Clear private data immediately, independently of the optional sample.
     clearTimeout(state.timer);state.revision++;disposeDoc();revokeMedia();clearPaymentHandoff();state.source=null;state.parsed=null;state.linked=null;state.messages=[];state.active=false;state.uiWarnings=[];state.dateConfirmed=true;state.page=0;state.rendering=false;state.dirty=false;
     resetSettings();$('document-title').value='';$('file-name').textContent='';$('file-name').removeAttribute('title');$('file-meta').textContent='';updateDates(true);updateParticipants();renderWarnings();setError('');
@@ -228,14 +276,14 @@
     $('inline-download-wrap').hidden=true;$('inline-download-progress').value=0;$('inline-download-status').textContent='Preparing your PDF…';
     $('step-customize').classList.remove('current');$('step-download').classList.remove('current');$('preview-tag').textContent='No chat';
     document.querySelectorAll('.sample-prompt').forEach(el=>{el.hidden=false;});
-    emptyPreview('Ready for your conversation.','Choose a ZIP or TXT with photos to get started.');
+    emptyPreview('Ready for your conversation.','Choose a supported chat export to get started.');
     $('dropzone').hidden=false;$('imported-file').hidden=true;$('import-status').textContent='Your conversation has been cleared.';updateDownloadEnabled();
     try{if(!state.sampleSource)state.sampleSource=makeSampleSource();}catch(_){}
-    emptyPreview('Your preview appears here.','Upload a WhatsApp export or try a sample.');
+    emptyPreview('Your preview appears here.','Upload a chat export or try a sample.');
     if(token===state.importRevision){toast('Your conversation has been cleared.');$('file-input').focus({preventScroll:true});}
   }
   function reparseDateOrder() {
-    if(!state.source)return;
+    if(!state.source||state.source.platform!=='whatsapp')return;
     try {
       const prepared=prepareSource(state.source,$('date-order').value);
       state.parsed=prepared.parsed;state.linked=prepared.linked;state.messages=assignExistingMedia(prepared.linked);
@@ -257,10 +305,10 @@
     const stats=state.doc?.stats;
     if(stats?.missingPhotoCount)base.push(`${stats.missingPhotoCount} ${stats.missingPhotoCount===1?'photo in this PDF is':'photos in this PDF are'} missing or unreadable. Labeled placeholders keep their positions.`);
     if(stats?.unsupportedMediaCount)base.push(`${stats.unsupportedMediaCount} unsupported ${stats.unsupportedMediaCount===1?'attachment in this PDF is':'attachments in this PDF are'} shown as filename placeholders.`);
-    if(stats?.omittedMediaCount)base.push(`${stats.omittedMediaCount} media ${stats.omittedMediaCount===1?'item in this selection was':'items in this selection were'} omitted by WhatsApp. Placeholders keep their positions.`);
+    if(stats?.omittedMediaCount)base.push(`${stats.omittedMediaCount} media ${stats.omittedMediaCount===1?'item in this selection was':'items in this selection were'} omitted by the source export. Placeholders keep their positions.`);
     if(state.active&&!state.sample&&state.parsed?.stats.systemMessages&&!$('include-system').checked){
       const hidden=state.messages.filter(m=>m.isSystem&&!m.invalidTimestamp).length;
-      if(hidden)base.push(`${hidden} WhatsApp system ${hidden===1?'notice in the original export is':'notices in the original export are'} hidden. Include them under Finishing touches if needed.`);
+      if(hidden)base.push(`${hidden} system ${hidden===1?'notice in the original export is':'notices in the original export are'} hidden. Include them under Finishing touches if needed.`);
     }
     return [...new Set(base)];
   }
@@ -466,11 +514,12 @@
   }
   function bindEvents() {
     $('clear-file').addEventListener('click',clearConversation);
+    $('conversation-open').addEventListener('click',openChosenConversation);
     // The actual, rendered native inputs receive the user's click/tap/key.
     // No synthetic .click(), hidden inputs, popup or activation delay is used.
     for(const id of ['file-input','replace-file-input']){
       $(id).addEventListener('change',async e=>{const input=e.currentTarget;const files=Array.from(input.files||[]);if(!files.length)return;try{await importFiles(files);}finally{input.value='';}});
-      $(id).addEventListener('cancel',()=>{if(!state.importing)$('import-status').textContent=state.active?'No new file selected. Your current conversation is unchanged.':'No file selected. Choose a ZIP, or a TXT and its photos.';});
+      $(id).addEventListener('cancel',()=>{if(!state.importing)$('import-status').textContent=state.active?'No new file selected. Your current conversation is unchanged.':'No file selected. Choose a supported chat ZIP, JSON, or WhatsApp TXT export.';});
     }
     for(const type of ['dragenter','dragover'])$('dropzone').addEventListener(type,e=>{e.preventDefault();$('dropzone').classList.add('dragover');});
     for(const type of ['dragleave','drop'])$('dropzone').addEventListener(type,e=>{e.preventDefault();$('dropzone').classList.remove('dragover');});
@@ -533,10 +582,10 @@
     }
     try {
       state.sampleSource=makeSampleSource();
-      emptyPreview('Your preview appears here.','Upload a WhatsApp export or try a sample.');
+      emptyPreview('Your preview appears here.','Upload a chat export or try a sample.');
       updateDownloadEnabled();
     }catch(error){
-      if(!state.active&&!state.importing){emptyPreview('Ready for your conversation.','Choose a ZIP or TXT with photos to get started.');setError('The sample preview could not load. File selection is still available. '+error.message);}
+      if(!state.active&&!state.importing){emptyPreview('Ready for your conversation.','Choose a supported chat export to get started.');setError('The sample preview could not load. File selection is still available. '+error.message);}
     }
   }
   initialize();
