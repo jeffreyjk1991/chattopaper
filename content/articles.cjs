@@ -222,12 +222,13 @@ if (articles.length !== 37) throw new Error(`Expected 37 focused articles, got $
 const detailed = require('./detailed-guides.cjs');
 const materiallyUpdated = new Set([
   'convert-whatsapp-chat-to-pdf',
+  'export-whatsapp-chat-android',
   'whatsapp-export-media-omitted',
   'whatsapp-photos-missing-from-pdf',
   'whatsapp-stickers-pdf'
 ]);
 for (const article of articles) {
   if (detailed[article.slug]) Object.assign(article, detailed[article.slug]);
-  if (materiallyUpdated.has(article.slug)) article.updated = '2026-10-28';
+  if (materiallyUpdated.has(article.slug)) article.updated = article.slug==='export-whatsapp-chat-android' ? '2026-10-30' : '2026-10-28';
 }
 module.exports = articles;
