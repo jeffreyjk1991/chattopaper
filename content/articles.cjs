@@ -47,10 +47,10 @@ const clusters = [
   {
     category: 'Photos & media',
     items: [
-      ['How to Print a WhatsApp Chat With Photos', 'print-whatsapp-chat-with-photos', 'Export with media, then use a converter that places each matched image near the message that referenced its filename. This is much more readable than printing the transcript and photos separately.', 'print whatsapp chat with photos'],
+      ['How to Print a WhatsApp Chat With Photos (iPhone & Android)', 'print-whatsapp-chat-with-photos', 'Print a WhatsApp chat with photos by exporting with media, converting the export to a paginated PDF, checking the photo matches, then printing from iPhone, Android, Windows or Mac.', 'print whatsapp chat with photos'],
       ['How to Convert WhatsApp ZIP to PDF With Photos', 'whatsapp-zip-to-pdf-with-photos', 'A ZIP-to-PDF workflow should inspect the chat text, locate photo references, match them to image files inside the ZIP, and show missing-photo warnings before creating the document.', 'whatsapp zip pdf photos'],
-      ['WhatsApp Photos Missing From Export or PDF? 7 Things to Check', 'whatsapp-photos-missing-from-pdf', 'If WhatsApp photos are missing, first check whether you exported with media, whether the image files are actually inside the ZIP, and whether their filenames still match the transcript. This guide walks through the most common causes and fixes.', 'whatsapp photos missing export pdf'],
-      ['WhatsApp Export Says “Media Omitted”? What It Means and How to Fix It', 'whatsapp-export-media-omitted', 'Seeing “Media omitted” in a WhatsApp export means the transcript knows an attachment existed but the actual file is not available in the export. Here is how to tell whether re-exporting with media can fix it and what cannot be recovered.', 'whatsapp export media omitted fix'],
+      ['WhatsApp Photos Missing From Export or PDF? 7 Fixes to Try', 'whatsapp-photos-missing-from-pdf', 'Missing WhatsApp photos usually come from exporting without media, absent files, renamed attachments, date filters or unsupported formats. Use these seven checks before recreating the PDF.', 'whatsapp photos missing export pdf'],
+      ['“Media Omitted” on WhatsApp: What It Means & What to Do', 'whatsapp-export-media-omitted', 'Seeing <Media omitted>, image omitted, video omitted or a similar marker in a WhatsApp export means the attachment itself is not in that export. Learn when re-exporting with media can restore it and when recovery is impossible.', 'media omitted whatsapp meaning'],
       ['How WhatsApp Photo Filenames Match Messages', 'whatsapp-photo-filenames-match-messages', 'WhatsApp exports often reference an attachment filename in the transcript. Matching that normalized filename to an exported image lets a converter restore the photo to the right point in the conversation.', 'whatsapp photo filename'],
       ['Can WhatsApp Voice Notes Be Put in a PDF?', 'whatsapp-voice-notes-pdf', 'A PDF can list that a voice note existed, but the audio itself is not naturally represented on paper. A simple chat-to-PDF tool should use a labeled placeholder unless it explicitly supports transcription or QR links.', 'whatsapp voice notes pdf'],
       ['Can WhatsApp Videos Be Included in a Printable PDF?', 'whatsapp-videos-printable-pdf', 'Video cannot play inside a normal printed page. A practical PDF can preserve the video filename or placeholder, while photos and text remain directly printable.', 'whatsapp video pdf'],
@@ -66,7 +66,7 @@ const clusters = [
       ['Best Font Size for a Printed WhatsApp Conversation', 'best-font-size-printed-whatsapp-chat', 'Use a size that remains comfortable on paper rather than matching the tiny phone interface. A moderate text size with generous spacing is usually easier to read over dozens of pages.', 'whatsapp print font size'],
       ['Chat Bubbles vs Transcript Layout for WhatsApp PDFs', 'whatsapp-pdf-chat-bubbles-vs-transcript', 'Chat bubbles feel familiar and personal; transcript layouts are denser and more formal. Pick based on whether the PDF is primarily a keepsake, a record, or a document someone needs to scan quickly.', 'whatsapp pdf layout'],
       ['How to Make a Long WhatsApp PDF Easier to Read', 'make-long-whatsapp-pdf-readable', 'Use date headings, sender labels, consistent timestamps, sensible margins, and restrained photo sizes. Filtering to the dates you actually need can reduce page count dramatically.', 'long whatsapp pdf readable'],
-      ['How to Print WhatsApp Messages Without Screenshots', 'print-whatsapp-messages-without-screenshots', 'Export the chat and convert the transcript to PDF. This preserves long stretches of text more efficiently and avoids manually cropping, ordering, and printing hundreds of screenshots.', 'print whatsapp without screenshots'],
+      ['How to Print WhatsApp Messages Without Screenshots', 'print-whatsapp-messages-without-screenshots', 'For a long WhatsApp conversation, export the chat and turn the TXT or ZIP into a paginated PDF instead of capturing dozens of screenshots. Keep names, timestamps and supported photos in order.', 'print whatsapp messages without screenshots'],
       ['How to Print a WhatsApp Conversation Double-Sided', 'print-whatsapp-conversation-double-sided', 'Create a normal paginated PDF first, then enable duplex or two-sided printing in your printer dialog. Review whether your printer flips on the long edge or short edge before a large print run.', 'double sided whatsapp print'],
       ['How to Print Only WhatsApp Messages From One Month', 'print-whatsapp-one-month', 'Use a date filter after importing the exported conversation. Keeping the source export unchanged gives you flexibility to create several month-specific PDFs later.', 'whatsapp one month pdf'],
       ['How to Make a WhatsApp Conversation Into a Keepsake Book', 'whatsapp-conversation-keepsake-book', 'Create a clean PDF, choose the date range and layout, inspect image quality, then print it yourself or upload the PDF to a book-printing provider. Keep the original export as a backup.', 'whatsapp keepsake book'],
@@ -225,10 +225,12 @@ const materiallyUpdated = new Set([
   'export-whatsapp-chat-android',
   'whatsapp-export-media-omitted',
   'whatsapp-photos-missing-from-pdf',
-  'whatsapp-stickers-pdf'
+  'whatsapp-stickers-pdf',
+  'print-whatsapp-chat-with-photos',
+  'print-whatsapp-messages-without-screenshots'
 ]);
 for (const article of articles) {
   if (detailed[article.slug]) Object.assign(article, detailed[article.slug]);
-  if (materiallyUpdated.has(article.slug)) article.updated = article.slug==='export-whatsapp-chat-android' ? '2026-10-30' : '2026-10-28';
+  if (materiallyUpdated.has(article.slug)) article.updated = ['whatsapp-export-media-omitted','whatsapp-photos-missing-from-pdf','print-whatsapp-chat-with-photos','print-whatsapp-messages-without-screenshots'].includes(article.slug) ? '2026-11-01' : (article.slug==='export-whatsapp-chat-android' ? '2026-10-30' : '2026-10-28');
 }
 module.exports = articles;
