@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = __dirname;
 const SITE = (process.env.SITE_URL || 'https://chattopaper.com').replace(/\/+$/, '');
-const UPDATED = '2026-10-23';
+const UPDATED = '2026-11-01';
 const FREE_LAUNCH = process.env.FREE_LAUNCH !== 'false';
 const INDEXNOW_KEY = '3a7f873b81f8e917ee92d1d32d7575be';
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -165,7 +165,7 @@ function articleHtml(a){
     '@context':'https://schema.org','@type':'FAQPage',
     mainEntity:a.faq.map(([question,answer])=>({'@type':'Question',name:question,acceptedAnswer:{'@type':'Answer',text:answer}}))
   }).replace(/</g,'\\u003c')}</script>` : '';
-  return layout({title:`${a.title} | ChatToPaper`,description:a.description,canonical,main,type:'article',jsonLd:jsonLd+howToJson+faqJson});
+  return layout({title:a.seoTitle || `${a.title} | ChatToPaper`,description:a.description,canonical,main,type:'article',jsonLd:jsonLd+howToJson+faqJson});
 }
 
 const platformGuides=[
