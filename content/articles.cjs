@@ -205,7 +205,16 @@ const KEEP = new Set([
   'whatsapp-supplier-orders-purchase-records',
   'whatsapp-contractor-job-records',
   'whatsapp-property-management-records',
-  'whatsapp-freelancer-client-records'
+  'whatsapp-freelancer-client-records',
+  'save-whatsapp-conversation-loved-one',
+  'print-whatsapp-one-month',
+  'whatsapp-export-multiple-txt-files',
+  'print-whatsapp-conversation-double-sided',
+  'save-whatsapp-chat-without-screenshots',
+  'whatsapp-android-export-with-media',
+  'print-part-whatsapp-chat-iphone',
+  'chat-bubble-vs-transcript-records',
+  'does-whatsapp-export-include-timestamps'
 ]);
 
 const articles = clusters
@@ -217,7 +226,7 @@ const articles = clusters
   })))
   .filter(article => KEEP.has(article.slug));
 
-if (articles.length !== 37) throw new Error(`Expected 37 focused articles, got ${articles.length}`);
+if (articles.length !== 46) throw new Error(`Expected 46 focused articles, got ${articles.length}`);
 
 const detailed = require('./detailed-guides.cjs');
 const materiallyUpdated = new Set([
@@ -227,10 +236,19 @@ const materiallyUpdated = new Set([
   'whatsapp-photos-missing-from-pdf',
   'whatsapp-stickers-pdf',
   'print-whatsapp-chat-with-photos',
-  'print-whatsapp-messages-without-screenshots'
+  'print-whatsapp-messages-without-screenshots',
+  'save-whatsapp-conversation-loved-one',
+  'print-whatsapp-one-month',
+  'whatsapp-export-multiple-txt-files',
+  'print-whatsapp-conversation-double-sided',
+  'save-whatsapp-chat-without-screenshots',
+  'whatsapp-android-export-with-media',
+  'print-part-whatsapp-chat-iphone',
+  'chat-bubble-vs-transcript-records',
+  'does-whatsapp-export-include-timestamps'
 ]);
 for (const article of articles) {
   if (detailed[article.slug]) Object.assign(article, detailed[article.slug]);
-  if (materiallyUpdated.has(article.slug)) article.updated = ['whatsapp-export-media-omitted','whatsapp-photos-missing-from-pdf','print-whatsapp-chat-with-photos','print-whatsapp-messages-without-screenshots'].includes(article.slug) ? '2026-11-01' : (article.slug==='export-whatsapp-chat-android' ? '2026-10-30' : '2026-10-28');
+  if (materiallyUpdated.has(article.slug)) article.updated = ['whatsapp-export-media-omitted','whatsapp-photos-missing-from-pdf','print-whatsapp-chat-with-photos','print-whatsapp-messages-without-screenshots','save-whatsapp-conversation-loved-one','print-whatsapp-one-month','whatsapp-export-multiple-txt-files','print-whatsapp-conversation-double-sided','save-whatsapp-chat-without-screenshots','whatsapp-android-export-with-media','print-part-whatsapp-chat-iphone','chat-bubble-vs-transcript-records','does-whatsapp-export-include-timestamps'].includes(article.slug) ? '2026-11-01' : (article.slug==='export-whatsapp-chat-android' ? '2026-10-30' : '2026-10-28');
 }
 module.exports = articles;
