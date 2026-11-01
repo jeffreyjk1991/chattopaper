@@ -71,10 +71,30 @@
           "value": "public, max-age=86400, stale-while-revalidate=604800"
         }
       ]
+    },
+    {
+      "source": "/runtime/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
     }
   ],
   "trailingSlash": true,
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "chattopaper.vercel.app"
+        }
+      ],
+      "destination": "https://chattopaper.com/:path*",
+      "permanent": true
+    },
     {
       "source": "/blog/save-whatsapp-conversation-as-pdf/",
       "destination": "/blog/convert-whatsapp-chat-to-pdf/",

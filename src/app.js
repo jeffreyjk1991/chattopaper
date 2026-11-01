@@ -22,6 +22,28 @@
   const txt = (tag, value, className) => {const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
   const platformLabel = value => ({whatsapp:'WhatsApp',telegram:'Telegram',meta:'Instagram / Messenger',imessage:'iMessage',sms:'SMS'})[value]||'Chat';
   function track(name, data={}) { try { if(typeof window.va==='function') window.va('event', {name, data}); } catch(_){} }
+  let pdfLibraryPromise=null;
+  function ensurePdfLibrary(){
+    if(window.PDFLib&&window.PDFLib.PDFDocument)return Promise.resolve();
+    if(pdfLibraryPromise)return pdfLibraryPromise;
+    pdfLibraryPromise=new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      script.src='/runtime/pdf-lib.min.js';
+      script.async=true;
+      script.dataset.chattopaperPdfEngine='1';
+      script.onload=()=>{
+        if(window.PDFLib&&window.PDFLib.PDFDocument){resolve();return;}
+        pdfLibraryPromise=null;
+        reject(new Error('The PDF component could not start. Refresh the page and try again.'));
+      };
+      script.onerror=()=>{
+        pdfLibraryPromise=null;
+        reject(new Error('The PDF component could not load. Check your connection and try again.'));
+      };
+      document.head.appendChild(script);
+    });
+    return pdfLibraryPromise;
+  }
   function conversionAttribution() {
     let stored={};
     try{stored=JSON.parse(sessionStorage.getItem('chattopaper.attribution.v1')||'{}')||{};}catch(_){}
@@ -479,6 +501,7 @@
     button.disabled=true;close.disabled=true;$('download-return').disabled=true;$('download-progress').hidden=false;$('download-progress').value=0;
     button.replaceChildren(document.createTextNode('Making your PDF…'));updateDownloadEnabled();
     try {
+      await ensurePdfLibrary();
       const blob=await ChatDocument.exportPDF(doc,(page,total)=>{
         const value=page/total;
         $('download-progress').value=value;$('download-status').textContent=`Preparing page ${page} of ${total}. Keep this tab open.`;

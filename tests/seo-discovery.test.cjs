@@ -127,3 +127,20 @@ test('guides landing page visibly represents every supported platform',()=>{
   ]) assert.ok(build.includes(text),text+' missing from Guides landing architecture');
   for(const hub of ['telegram','instagram','messenger','imessage','sms']) assert.ok(platformData.includes("hub:'"+hub+"'"),hub+' hub missing');
 });
+
+test('commercial landing pages and technical WhatsApp reference are discoverable',()=>{
+  const build=fs.readFileSync('build.cjs','utf8');
+  const home=fs.readFileSync('src/index.html','utf8');
+  for(const path of ['whatsapp-to-pdf','telegram-to-pdf','instagram-dm-to-pdf','messenger-to-pdf','imessage-to-pdf','sms-to-pdf','whatsapp-chat-export-format']) assert.ok(build.includes(path),path+' missing from build');
+  for(const path of ['/whatsapp-to-pdf/','/telegram-to-pdf/','/instagram-dm-to-pdf/','/messenger-to-pdf/','/imessage-to-pdf/','/sms-to-pdf/']) assert.ok(home.includes(path),path+' missing from homepage links');
+});
+
+test('website defers the heavy PDF engine until PDF creation',()=>{
+  const build=fs.readFileSync('build.cjs','utf8');
+  const app=fs.readFileSync('src/app.js','utf8');
+  assert.match(build,/PDF engine loads on demand/);
+  assert.match(build,/runtime\/pdf-lib\.min\.js/);
+  assert.match(app,/ensurePdfLibrary/);
+  assert.match(app,/\/runtime\/pdf-lib\.min\.js/);
+});
+
