@@ -188,5 +188,117 @@ module.exports = {
       ['Why does my PDF show a sticker placeholder?', 'The export may not contain the sticker file, or its format may not be supported for direct rendering. The placeholder preserves the message position.'],
       ['Are WhatsApp stickers usually WebP files?', 'WhatsApp commonly uses WebP for stickers, although the exact exported files can vary by device and export.']
     ]
+  },
+  'save-whatsapp-conversation-loved-one': {
+    seoTitle: 'How to Save a WhatsApp Conversation With a Loved One',
+    description: 'Save a meaningful WhatsApp conversation with a loved one as a private, readable PDF with dates and supported photos. Keep the original export as a source copy.',
+    sections: [
+      ['A simple way to preserve the conversation', `<p>Export the WhatsApp chat, include media when the photos matter, then create a PDF that keeps names, timestamps and supported images in sequence. The original export should remain untouched; the PDF is the readable keepsake.</p>`],
+      ['Choose a meaningful scope', `<p>A lifetime of routine messages can make a keepsake enormous. Pick a meaningful period such as a trip, anniversary, year or family event. ChatToPaper lets you filter the final PDF by date without editing the source export.</p>`],
+      ['Protect the private parts', `<p>Before sharing or printing, review names, phone numbers, addresses, personal photos and sensitive messages. A keepsake can be meaningful without including every private detail.</p>`],
+      ['Make it printable', `<ol class="steps"><li>Export the chat from WhatsApp.</li><li>Include media if important photos should appear.</li><li>Open the export in ChatToPaper.</li><li>Choose the date range and layout.</li><li>Preview photo-heavy pages and long messages.</li><li>Download the PDF and keep the original export separately.</li></ol>`]
+    ],
+    faq: [
+      ['Can I save a WhatsApp conversation as a keepsake?', 'Yes. Export the chat, create a readable PDF, and keep the untouched export separately as the source.'],
+      ['Can the keepsake include photos?', 'Yes, when supported photo files are included in the WhatsApp export and can be matched to their message references.']
+    ]
+  },
+  'print-whatsapp-one-month': {
+    seoTitle: 'How to Print One Month of a WhatsApp Chat',
+    description: 'Print only one month of a WhatsApp conversation by exporting the chat, filtering the PDF by start and end date, previewing the pages, then printing the shortened document.',
+    sections: [
+      ['Use the export as the source, then filter the PDF', `<p>You do not need to delete messages manually. Export the available WhatsApp conversation, import it, then set the start and end dates for the month you need. This keeps the original export intact while the PDF contains only the selected period.</p>`],
+      ['Pick the exact month', `<ol class="steps"><li>Import the TXT or ZIP.</li><li>Open Customize PDF.</li><li>Set the first day of the month as the start date.</li><li>Set the last day of the month as the end date.</li><li>Confirm the first and last visible messages in the preview.</li><li>Download and print the shortened PDF.</li></ol>`],
+      ['Watch for timezone and date-order confusion', `<p>WhatsApp text exports can use regional date formats. If a date such as 04/05 is ambiguous, confirm whether the file uses day/month or month/day before filtering. A plausible-looking wrong date interpretation can exclude the wrong messages.</p>`]
+    ],
+    faq: [
+      ['Can WhatsApp export only one month directly?', 'The reliable workflow is to export the available chat and filter the final PDF by date. That avoids altering the source conversation file.'],
+      ['Can I make several month-by-month PDFs from one export?', 'Yes. Keep the original export and create separate PDFs with different date ranges.']
+    ]
+  },
+  'whatsapp-export-multiple-txt-files': {
+    seoTitle: 'Why a WhatsApp Export Has Multiple TXT Files',
+    description: 'A WhatsApp ZIP can contain more than one TXT file because text documents can be attachments. Learn how to identify the actual chat transcript before converting it.',
+    sections: [
+      ['Why more than one TXT can appear', `<p>The main WhatsApp transcript is a text file, but a conversation can also contain text documents sent as attachments. Those attached documents may also end in .txt, so a ZIP can legitimately contain several text files.</p>`],
+      ['How to identify the chat transcript', `<p>The chat transcript contains repeated message headers with dates, times and sender names. An attached text document usually reads like ordinary prose or data instead. Do not simply choose the largest TXT file.</p>`],
+      ['What ChatToPaper does', `<p>ChatToPaper inspects candidate text files for recognizable WhatsApp message headers rather than treating every TXT as the conversation. If an archive is ambiguous, start from the untouched export rather than combining files from different chats.</p>`]
+    ],
+    faq: [
+      ['Does multiple TXT files mean the export is broken?', 'No. Some TXT files may be documents that were shared inside the conversation.'],
+      ['Should I rename the files?', 'No. Keep the original filenames until conversion, especially when media and attachments need to be matched to message references.']
+    ]
+  },
+  'print-whatsapp-conversation-double-sided': {
+    seoTitle: 'How to Print a WhatsApp Conversation Double-Sided',
+    description: 'Create a paginated WhatsApp PDF, then print it double-sided using duplex printing. Learn long-edge vs short-edge flipping and how to test before a long print run.',
+    sections: [
+      ['Create the PDF first', `<p>Double-sided printing is a printer setting, not a WhatsApp export setting. First create a normal paginated PDF with the conversation in the correct order.</p>`],
+      ['Choose duplex printing', `<p>In the print dialog, enable Two-Sided, Duplex or Print on Both Sides. For a portrait document, <strong>flip on the long edge</strong> is usually the book-like option. Short-edge flipping is more like a notepad and can make the reverse side appear upside down.</p>`],
+      ['Test two sheets before printing everything', `<ol class="steps"><li>Print pages 1–4 only.</li><li>Check that page 2 appears behind page 1 in the expected orientation.</li><li>Confirm margins and scale.</li><li>Only then print the full PDF.</li></ol>`]
+    ],
+    faq: [
+      ['Should I flip on the long edge or short edge?', 'For most portrait WhatsApp PDFs, long-edge flipping gives normal book-style reading. Test a few pages because printer menus vary.']
+    ]
+  },
+  'save-whatsapp-chat-without-screenshots': {
+    seoTitle: 'Save a WhatsApp Chat Without Screenshots',
+    description: 'Save a long WhatsApp chat without screenshots by exporting the conversation and turning the TXT or ZIP into a searchable, paginated PDF.',
+    sections: [
+      ['Why export beats screenshots for long chats', `<p>Exporting avoids hundreds of manual captures, overlapping screenshots, missing gaps and inconsistent page sizes. The source transcript already contains the message sequence and timestamps.</p>`],
+      ['A cleaner six-step workflow', `<ol class="steps"><li>Export the conversation from WhatsApp.</li><li>Include media if photos matter.</li><li>Import the TXT or ZIP.</li><li>Verify names, dates and missing-media warnings.</li><li>Preview the page breaks.</li><li>Download the PDF and keep the original export separately.</li></ol>`],
+      ['When screenshots still make sense', `<p>For one or two messages, screenshots are faster. For a long conversation, an exported transcript is easier to verify, search, paginate and print.</p>`]
+    ],
+    faq: [
+      ['Can I save a WhatsApp conversation without screenshots?', 'Yes. Use WhatsApp Export Chat, then convert the exported TXT or ZIP into a PDF.']
+    ]
+  },
+  'whatsapp-android-export-with-media': {
+    seoTitle: 'WhatsApp Android Export With Media: Step by Step',
+    description: 'Export a WhatsApp chat with media on Android, keep the generated files together, verify missing photos, and convert the result into a printable PDF.',
+    sections: [
+      ['Export from Android', `<ol class="steps"><li>Open the WhatsApp conversation.</li><li>Open the three-dot menu.</li><li>Choose More, then Export chat.</li><li>Choose the option to include media when photos are needed.</li><li>Save or share the resulting export somewhere you can open it in a full browser.</li></ol>`],
+      ['Check what was actually included', `<p>An export with media can still be incomplete if a file is unavailable. Inspect the ZIP or import it into ChatToPaper and compare the matched-photo and missing-media counts before creating the final PDF.</p>`],
+      ['Keep filenames unchanged', `<p>Attachment matching depends on the references in the transcript. Renaming exported photos can prevent them from being placed beside the correct messages.</p>`]
+    ],
+    faq: [
+      ['Does Include media guarantee every photo is present?', 'No. Verify the actual export. A converter can only place files that WhatsApp included and that remain available.']
+    ]
+  },
+  'print-part-whatsapp-chat-iphone': {
+    seoTitle: 'How to Print Part of a WhatsApp Chat on iPhone',
+    description: 'Print only part of a WhatsApp chat from iPhone by exporting the conversation, filtering the PDF by date, checking the preview, and printing the selected period.',
+    sections: [
+      ['Export first, filter second', `<p>Export the conversation from WhatsApp on iPhone, then choose the date range for the final PDF. This is safer than deleting messages from the transcript or assembling screenshots manually.</p>`],
+      ['Select the section you need', `<ol class="steps"><li>Save the WhatsApp export to Files or another accessible location.</li><li>Open it in ChatToPaper.</li><li>Set the From and To dates.</li><li>Confirm the first and last messages in the preview.</li><li>Download the shortened PDF.</li><li>Open the PDF in Files and use Share → Print.</li></ol>`],
+      ['If you need only a few messages', `<p>For a tiny excerpt, screenshots may be faster. For a multi-day or multi-week section, the date-filtered PDF is easier to paginate and review.</p>`]
+    ],
+    faq: [
+      ['Can I print only part of a WhatsApp chat on iPhone?', 'Yes. Export the conversation, filter the PDF to the dates you need, then print the downloaded PDF from iPhone or another device.']
+    ]
+  },
+  'chat-bubble-vs-transcript-records': {
+    seoTitle: 'Chat Bubbles vs Transcript Layout for WhatsApp Records',
+    description: 'Compare chat bubbles with a plain transcript layout for WhatsApp PDFs. Bubbles are familiar; transcripts are denser and easier to scan for records.',
+    sections: [
+      ['Which layout should you choose?', `<div class="table-scroll"><table><thead><tr><th>Layout</th><th>Best for</th><th>Trade-off</th></tr></thead><tbody><tr><td>Chat bubbles</td><td>Keepsakes, familiar reading, visual conversation flow</td><td>Uses more page space</td></tr><tr><td>Plain transcript</td><td>Business records, review, printing many messages</td><td>Looks less like the app</td></tr></tbody></table></div>`],
+      ['For records, scanability usually wins', `<p>A transcript layout can place more text on each page and makes names, timestamps and message sequence easier to scan. That matters when the PDF is supporting a job file, order, quote or project record.</p>`],
+      ['For memories, familiarity can matter more', `<p>Chat bubbles feel closer to a messaging experience and can make a personal keepsake easier to read. Use the preview to compare page count and readability before deciding.</p>`]
+    ],
+    faq: [
+      ['Is a transcript layout more official?', 'No. Layout does not authenticate a conversation. It only changes presentation and page density.']
+    ]
+  },
+  'does-whatsapp-export-include-timestamps': {
+    seoTitle: 'Does WhatsApp Export Include Timestamps?',
+    description: 'Yes, WhatsApp text exports normally include date and time information with messages. Learn how timestamps are parsed, why regional date order matters, and what to verify.',
+    sections: [
+      ['The short answer', `<p>WhatsApp chat exports normally include date and time information in the transcript. A converter can preserve those exported values in a PDF, but it should not invent a timezone that is not present in the source text.</p>`],
+      ['Regional date order can be ambiguous', `<p>A timestamp such as 04/05 can mean April 5 or May 4. If the export does not contain enough unambiguous dates to infer the order, confirm the correct day/month or month/day interpretation before downloading.</p>`],
+      ['What to verify', `<ul><li>A message whose date you already know.</li><li>Whether the clock is 12-hour or 24-hour.</li><li>Whether multiline messages stay attached to the correct timestamp.</li><li>Whether system notices are included or hidden intentionally.</li></ul>`]
+    ],
+    faq: [
+      ['Does WhatsApp export show the exact time?', 'The text export normally includes the local-looking date and clock time recorded in the transcript. It does not necessarily identify a timezone.']
+    ]
   }
 };
