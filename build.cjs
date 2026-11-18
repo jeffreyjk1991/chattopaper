@@ -556,20 +556,29 @@ write('manifest.webmanifest',JSON.stringify({name:'ChatToPaper',short_name:'Chat
 write('404.html',layout({title:'Page not found | ChatToPaper',description:'The requested ChatToPaper page could not be found.',canonical:`${SITE}/404`,robots:'noindex,follow',main:`<main class="article"><div class="eyebrow">404</div><h1>That page slipped away.</h1><p class="lede">Try the guide library or go back to the chat-to-PDF converter.</p><p><a class="btn" href="/blog/">Browse guides</a> <a class="btn" href="/">Go home</a></p></main>`}));
 
 console.log(`Built converter + ${articles.length} articles + ${cats.length} category hubs. Sitemap URLs: ${sitemapUrls.length}.`);
-// Submit only after production URLs are live, never from local or preview builds.
+// Notify IndexNow only from production builds and only for URLs that were recently changed.
 if (process.env.SUBMIT_INDEXNOW === 'true') (async () => {
   try {
-    const response = await fetch('https://api.indexnow.org/indexnow', {
-      method: 'POST',
-      headers: {'content-type':'application/json'},
-      body: JSON.stringify({
-        host: new URL(SITE).host,
-        key: INDEXNOW_KEY,
-        keyLocation: `${SITE}/${INDEXNOW_KEY}.txt`,
-        urlList: sitemapUrls.map(item => item.loc)
-      })
+    const recentUrls = sitemapUrls
+      .filter(item => item.lastmod === '2026-11-17')
+      .map(item => item.loc);
+    if (!recentUrls.length) return;
+    const payload = JSON.stringify({
+      host: new URL(SITE).host,
+      key: INDEXNOW_KEY,
+      urlList: recentUrls
     });
-    if (response.ok || response.status === 202) console.log(`IndexNow accepted ${sitemapUrls.length} URLs (HTTP ${response.status}).`);
+    const submit = endpoint => fetch(endpoint, {
+      method: 'POST',
+      headers: {'content-type':'application/json; charset=utf-8','user-agent':'ChatToPaper-IndexNow/1.0'},
+      body: payload
+    });
+    let response = await submit('https://api.indexnow.org/indexnow');
+    if (!response.ok && response.status === 403) {
+      console.warn('IndexNow global endpoint rejected key validation; retrying through Bing.');
+      response = await submit('https://www.bing.com/indexnow');
+    }
+    if (response.ok || response.status === 202) console.log(`IndexNow accepted ${recentUrls.length} recently changed URLs (HTTP ${response.status}).`);
     else console.warn(`IndexNow submission returned HTTP ${response.status}; deployment continues.`);
   } catch (error) {
     console.warn('IndexNow submission skipped:', error.message);
