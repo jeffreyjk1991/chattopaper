@@ -53,7 +53,8 @@ for(const guide of platformSeoGuides){
 }
 for(const platform of seoPlatforms){
   const html=read(`blog/platform/${platform.hub}/index.html`);
-  assert.ok(html.includes(`<h1>${platform.name} → PDF guides</h1>`));
+  assert.ok(html.includes(`<h1>${platform.hubTitle || platform.name + ' → PDF guides'}</h1>`));
+  assert.ok(html.includes(platform.hubDescription || `Practical guides for exporting, printing, archiving and converting ${platform.name} conversations to PDF with ChatToPaper.`));
   assert.ok(sitemap.includes(`/blog/platform/${platform.hub}/</loc>`));
   for(const guide of platformSeoGuides.filter(g=>g.platform===platform.key)) assert.ok(html.includes(`/blog/${guide.slug}/`));
 }
