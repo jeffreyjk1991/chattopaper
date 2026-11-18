@@ -144,3 +144,21 @@ test('website defers the heavy PDF engine until PDF creation',()=>{
   assert.match(app,/\/runtime\/pdf-lib\.min\.js/);
 });
 
+
+
+test('Search Console opportunity pages target non-WhatsApp archive intent without changing core discovery',()=>{
+  const platformData=fs.readFileSync('content/platform-seo-guides.cjs','utf8');
+  const renderer=fs.readFileSync('content/platform-seo-renderer.cjs','utf8');
+  const build=fs.readFileSync('build.cjs','utf8');
+  assert.match(platformData,/How to Archive iMessage Conversations/);
+  assert.match(platformData,/archive imessage/);
+  assert.match(platformData,/How to Archive an Instagram DM Conversation/);
+  assert.match(platformData,/How to Archive a Telegram Chat/);
+  assert.match(platformData,/How to Archive SMS & Text Messages/);
+  assert.match(renderer,/Start with the most searched question/);
+  assert.match(build,/archive-imessage-conversation/);
+  assert.match(build,/archive-instagram-conversation/);
+  assert.match(build,/archive-telegram-conversation/);
+  assert.match(build,/archive-sms-conversation/);
+  assert.match(build,/OAI-SearchBot/);
+});
