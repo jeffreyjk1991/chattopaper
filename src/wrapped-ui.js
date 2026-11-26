@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const $=id=>document.getElementById(id),file=$('wrap-file'),order=$('wrap-order'),year=$('wrap-year'),anon=$('wrap-anon'),style=$('wrap-style'),format=$('wrap-format'),status=$('wrap-status'),canvas=$('wrap-canvas'),download=$('wrap-download'),share=$('wrap-share'),ctx=canvas.getContext('2d');
-let raw=null,parsed=null,stats=null,demo=true,blob=null,version=0,loadId=0,loading=false,platform='whatsapp',selectedFiles=[],sourceWarnings=[];
+let raw=null,parsed=null,stats=null,demo=true,blob=null,version=0,loadId=0,loading=false,platform='whatsapp',selectedFiles=[],sourceWarnings=[],generationEvent=null;
 const platformHint=document.body.dataset.wrappedPlatform||'all',chooser=$('wrap-conversation'),conversation=$('wrap-conversation-select'),platformLabel=$('wrap-platform-label');
 const N=n=>Number(n).toLocaleString('en-US'),logo=new Image();logo.src='/favicon.png';
 const example={total:48291,participants:[['Alex',18351],['Sam',15000],['Jordan',12000],['Chris',2940]],quiet:['Chris',2940],night:['Sam',812],emoji:['💀',2481],day:['2026-07-18',610],hour:[21,3900],activeDays:301,streak:48,attachments:690,first:'2026-01-01',last:'2026-11-25',excluded:0};
@@ -49,7 +49,7 @@ tile('Top emoji',s.emoji?s.emoji[0]:'—',s.emoji?N(s.emoji[1])+' uses':'No emoj
 text(N(s.participants.length)+' members · '+s.first+' to '+s.last,x,h-195,28,muted,950,500);ctx.fillStyle='#69577e';ctx.fillRect(x,h-170,952,2);
 if(logo.complete&&logo.naturalWidth){ctx.save();ctx.beginPath();ctx.arc(x+31,h-106,31,0,Math.PI*2);ctx.clip();ctx.drawImage(logo,x,h-137,62,62);ctx.restore()}
 text('ChatToPaper',x+78,h-107,39,fg,875);text('Make yours free at chattopaper.com/chat-wrapped/',x+78,h-68,28,green,865,600);
-const token=++version;blob=null;download.disabled=share.disabled=true;canvas.toBlob(b=>{if(token!==version)return;if(b){blob=b;download.disabled=share.disabled=false}else setStatus('Image creation failed. Try another browser.')},'image/png');
+const token=++version;blob=null;download.disabled=share.disabled=true;canvas.toBlob(b=>{if(token!==version)return;if(b){blob=b;download.disabled=share.disabled=false;if(!demo&&generationEvent?.record(platform))track('wrapped_generated')}else setStatus('Image creation failed. Try another browser.')},'image/png');
 }
 function clear(){version++;blob=null;download.disabled=share.disabled=true;canvas.width=1080;canvas.height=1350;ctx.fillStyle='#19152c';ctx.fillRect(0,0,1080,1350);text('Choose an export to begin',60,130,48,'#fff',950)}
 function show(){if(!parsed)return;stats=ChatWrapped.analyze(parsed.messages,year.value);demo=false;if(!stats.total){clear();$('wrap-result').textContent='No messages for this period';setStatus('Choose another year or check date order.');return}
@@ -64,7 +64,7 @@ function initParsed(){
 function fail(e){parsed=null;stats=null;year.disabled=true;clear();$('wrap-result').textContent='No report generated.';setStatus(e.message||'This chat could not be parsed.')}
 function parse(){if(!raw)return;try{parsed=ChatImport.parse(raw,{dateOrder:order.value});initParsed()}catch(e){fail(e)}}
 async function load(conversationId){
- const id=++loadId;loading=true;raw=null;parsed=null;stats=null;demo=false;sourceWarnings=[];year.disabled=true;clear();setStep(0);$('wrap-result').textContent='Reading export…';setStatus('Reading your chat locally…');platformLabel.textContent='';
+ const id=++loadId;generationEvent=WrappedCounter.begin();loading=true;raw=null;parsed=null;stats=null;demo=false;sourceWarnings=[];year.disabled=true;clear();setStep(0);$('wrap-result').textContent='Reading export…';setStatus('Reading your chat locally…');platformLabel.textContent='';
  if(!conversationId){chooser.hidden=true;conversation.replaceChildren()}
  try{
  const source=await WrappedImport.readFiles(selectedFiles,{conversationId,skipMedia:true});if(id!==loadId)return;
@@ -77,13 +77,13 @@ async function load(conversationId){
  platform=source.platform;sourceWarnings=(source.warnings||[]).slice(0,2);
  $('wrap-advanced').hidden=platform!=='whatsapp';
  if(platform==='whatsapp'){raw=source.text;parse()}else{parsed=source.parsed;initParsed()}
- if(stats?.total)track('wrapped_generated');
+
  }catch(e){if(id!==loadId)return;loading=false;fail(e)}
 }
 file.addEventListener('change',()=>{if(!file.files.length)return;selectedFiles=[file.files[0]];fileName.textContent=file.files[0].name;load()});
-conversation.addEventListener('change',()=>{if(conversation.value)load(conversation.value);else{loadId++;loading=false;parsed=null;stats=null;year.disabled=true;clear();setStatus('Choose a conversation.')}});
+conversation.addEventListener('change',()=>{if(conversation.value)load(conversation.value);else{loadId++;generationEvent=null;loading=false;parsed=null;stats=null;year.disabled=true;clear();setStatus('Choose a conversation.')}});
 order.addEventListener('change',()=>{if(!loading)parse()});year.addEventListener('change',show);for(const c of [anon,style,format])c.addEventListener('change',render);
-$('wrap-sample').addEventListener('click',()=>{loadId++;loading=false;raw=null;parsed=null;stats=null;selectedFiles=[];file.value='';fileName.textContent='';platformLabel.textContent='';chooser.hidden=true;conversation.replaceChildren();$('wrap-advanced').hidden=false;setStep(0);demo=true;year.disabled=true;year.replaceChildren(new Option('2026','2026'));$('wrap-result').textContent='Illustrative sample · not actual chat data';setStatus('Sample only. Choose your export for real statistics.');render()});
+$('wrap-sample').addEventListener('click',()=>{loadId++;generationEvent=null;loading=false;raw=null;parsed=null;stats=null;selectedFiles=[];file.value='';fileName.textContent='';platformLabel.textContent='';chooser.hidden=true;conversation.replaceChildren();$('wrap-advanced').hidden=false;setStep(0);demo=true;year.disabled=true;year.replaceChildren(new Option('2026','2026'));$('wrap-result').textContent='Illustrative sample · not actual chat data';setStatus('Sample only. Choose your export for real statistics.');render()});
 function save(b){const url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download=(demo?'sample-':'')+'chattopaper-wrapped-'+(demo?'2026':year.value)+'-'+style.value+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 download.addEventListener('click',()=>{if(blob){save(blob);if(!demo){setStep(2);track('wrapped_downloaded')}}});
 share.addEventListener('click',async()=>{if(!blob)return;const image=blob;try{const f=new File([image],'chattopaper-wrapped.png',{type:'image/png'});if(navigator.canShare?.({files:[f]})){await navigator.share({files:[f],title:'My Chat Wrapped by ChatToPaper'});if(!demo){setStep(2);track('wrapped_shared')}}else{save(image);if(!demo){setStep(2);track('wrapped_downloaded')}setStatus('Image downloaded. Share it in WhatsApp, Instagram or any app.')}}catch(e){if(e.name!=='AbortError'){save(image);setStatus('Native sharing unavailable. Image downloaded instead.')}}});
