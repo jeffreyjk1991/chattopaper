@@ -1,0 +1,9 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const wrapped=require('../src/wrapped-core.js'),parser=require('../src/importer.js');
+test('Wrapped counts real dated senders, multiline messages, emoji, and local midnight',()=>{
+const data=parser.parse('[12/31/2025, 11:59 PM] Alex: Old\n[1/1/2026, 12:15 AM] Alex: 💀💀\nsecond line\n[1/1/2026, 9:00 AM] Sam: Hi 👨‍👩‍👧‍👦\n[1/2/2026, 2:00 AM] Alex: <Media omitted>\n[1/2/2026, 9:00 AM] System notice\n[1/4/2026, 9:00 AM] Sam: 💀',{dateOrder:'MDY'}).messages;
+const s=wrapped.analyze(data,'2026');assert.equal(s.total,4);assert.equal(s.activeDays,3);assert.equal(s.streak,2);assert.deepEqual(s.night,['Alex',2]);assert.deepEqual(s.emoji,['💀',3]);assert.equal(s.attachments,1);assert.equal(s.excluded,1);assert.equal(wrapped.analyze(data,'all').total,5);assert.deepEqual(wrapped.years(data),['2026','2025']);assert.equal(wrapped.aliasMap(s).get('Alex'),'Member 1');
+});
+test('No artificial quiet or night-owl award for absent data',()=>{const s=wrapped.analyze([{sender:'A',timestamp:Date.UTC(2026,0,1,10),dateKey:'2026-01-01',text:'hello'}],'2026');assert.equal(s.quiet,null);assert.equal(s.night,null);assert.equal(s.emoji,null);assert.equal(wrapped.analyze([],'2026').total,0)});
+test('Wrapped isolated importer supports 48,291 exported messages without changing PDF cap',()=>{const code=fs.readFileSync(require.resolve('../src/importer.js'),'utf8').replace('messages: 20000,','messages: 200000,').replace('over 20,000 messages','over 200,000 messages');const mod={exports:{}};vm.runInNewContext(code,{module:mod});const input=Array.from({length:48291},(_,i)=>'[1/1/2026, 10:00 AM] '+(i%2?'Sam':'Alex')+': Hi').join('\n');assert.equal(parser.LIMITS.messages,20000);const p=mod.exports.parse(input,{dateOrder:'MDY'});assert.equal(p.messages.length,48291);assert.equal(wrapped.analyze(p.messages,'2026').total,48291)});
